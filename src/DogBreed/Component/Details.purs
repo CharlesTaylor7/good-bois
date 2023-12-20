@@ -33,10 +33,14 @@ component props = Deku.do
       _
         """
         <div class="flex flex-col items-center justify-center">
+          <a ~breadcrumbAttrs~>Back to Breeds</a>
           <h2 class="text-xl font-semibold">Dog Breed Images</h2>
           <ul class="pl-4 list-disc">
           </ul>
         </div>
         """
-  ) ~~ {}
+  ) ~~
+    { breadcrumbAttrs: D.OnClick !:= do
+        props.setPage BreedListPage
+    }
 

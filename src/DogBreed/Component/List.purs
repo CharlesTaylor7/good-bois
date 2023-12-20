@@ -31,11 +31,17 @@ component props = Deku.do
         </div>
         """
   ) ~~
-    { children: dogBreedComponent defaultBreed
+    { children: dogBreedComponent { breed: defaultBreed, setPage: props.setPage }
     }
 
-dogBreedComponent :: Breed -> Nut
-dogBreedComponent breed =
+dogBreedComponent ::
+  forall rest.
+  { breed :: Breed
+  , setPage :: Page -> Effect Unit
+  | rest
+  } ->
+  Nut
+dogBreedComponent props =
   Deku.do
     ( pursx ::
         _
@@ -54,9 +60,8 @@ dogBreedComponent breed =
     ~~
       { breedAttrs:
           D.OnClick !:= do
-            Console.log $ "Hello " <> breed.name
+            props.setPage $ BreedDetailsPage props.breed.name
 
       , subBreeds:
-          breed.subBreeds # foldMap (\name -> (pursx :: _ "<li>~name~</li>") ~~ { name: text_ name })
+          props.breed.subBreeds # foldMap (\name -> (pursx :: _ "<li>~name~</li>") ~~ { name: text_ name })
       }
-
