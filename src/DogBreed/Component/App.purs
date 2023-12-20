@@ -33,11 +33,11 @@ component = Deku.do
       _
         """
           <h2>Dog Breeds</h2>
-          <ul class="Breedlist" >
+          <ul>
             <li>
               <a>Hound</a>
-              <ul class="sub-breed-list">
-                <<a>Hound</a>
+              <ul>
+                <li><a>Hound</a></li>
               </ul>
             </li>
           </ul>
