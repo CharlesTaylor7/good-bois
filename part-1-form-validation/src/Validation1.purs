@@ -1,4 +1,4 @@
-module Validation
+module Validation1
   ( FormData
   ) where
 

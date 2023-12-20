@@ -1,4 +1,4 @@
-module Validation
+module Validation2
   ( Raw
   , Error
   , Valid
