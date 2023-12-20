@@ -32,15 +32,18 @@ component = Deku.do
   ( pursx ::
       _
         """
+        <div>
           <h2>Dog Breeds</h2>
           <ul>
             <li>
               <a>Hound</a>
               <ul>
-                <li><a>Hound</a></li>
+                <li>Basset</li>
+                <li>Daschan</li>
               </ul>
             </li>
           </ul>
+        </div>
         """
   ) ~~ {}
 
