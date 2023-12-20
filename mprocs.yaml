@@ -1,14 +1,6 @@
 procs:
   Test:
-    shell: watchexec -e purs,js,yaml --clear -- yarn test
+    shell: watchexec -e purs,js,yaml --clear -- npm run test
 
   Dev Server:
-    shell: yarn watch:js
-
-  Tailwind:
-    shell: yarn tailwind --watch
-
-  Legacy Haskell App:
-    cwd: haskell/
-    shell: ./scripts/run-dev.sh
-    autostart: false
+    shell: npm run watch:js

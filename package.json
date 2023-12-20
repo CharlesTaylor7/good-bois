@@ -1,29 +1,22 @@
 {
-  "name": "gemini",
+  "name": "pansoft",
   "version": "0.0.0",
-  "repository": "git@github.com:CharlesTaylor7/gemini.git",
+  "repository": "git@github.com:CharlesTaylor7/pansoft.git",
   "author": "Charles Taylor <charlestaylor95@gmail.com>",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "postinstall": "spago install",
     "test": "spago test",
-    "watch:js": "PORT=3000 vite",
+    "watch:js": "vite --port=3000",
     "watch:purs": "watchexec -e purs,yaml,js -- spago build",
-    "tailwind": "tailwindcss -i tailwind.source.css -o dist/tailwind.css",
-    "prebundle": "yarn tailwind && cp -r static/* dist/",
-    "bundle": "spago bundle -p gemini --minify --outfile dist/index.js",
-    "clean:purs": "rm -rf .spago/ output/",
-    "bench": "spago run -p gemini-bench -m Benchmark.Main"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
     "esbuild": "^0.19.2",
-    "prettier": "^3.0.2",
     "purescript": "0.15.10",
     "purs-tidy": "^0.10.0",
     "spago": "^0.93.18",
-    "tailwindcss": "^3.3.3",
     "vite": "^4.4.9"
   }
 }
