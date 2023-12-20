@@ -1,0 +1,9 @@
+package:
+  name: gemini-bench
+  dependencies:
+    - benchotron
+    - gemini
+    - effect
+    - partial
+    - prelude
+ 
