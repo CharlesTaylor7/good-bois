@@ -33,7 +33,12 @@ component props = Deku.do
       _
         """
         <div class="flex flex-col items-center justify-center">
-          <a ~breadcrumbAttrs~>Back to Breeds</a>
+          <a 
+          class="flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
+          ~breadcrumbAttrs~
+          >
+            Back to Breeds
+          </a>
           <h2 class="text-xl font-semibold">Dog Breed Images</h2>
           <ul class="pl-4 list-disc">
           </ul>
