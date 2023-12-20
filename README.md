@@ -35,5 +35,11 @@ Notes:
 
 # TODO
 - [ ] Basic version, no fluff
+    - [ ] Dog Breed List
+        - [ ] fetch from api once
+        - [ ] list breeds and subbreads
+        - [ ] alphabetize
+        - [ ] Clickable breads
+    - [ ] Dog Breed Details 
 - [ ] Trim down dep list
 - [ ] Split project into 2 separate spago projects?
