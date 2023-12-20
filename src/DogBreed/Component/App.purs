@@ -22,90 +22,27 @@ import Gemini.Store (Store, useStore)
 import Gemini.Store as Store
 import Resize as Resize
 
-useAppState :: (_ -> _) -> Nut
-useAppState continuation = Deku.do
-  gemini <- useStore Gemini.initialGemini
-  drag <- useStore (Nothing :: _ Drag)
-  scrambleTime <- useStore Nothing
-  setSolveTime /\ solveTime <- useState'
-  pushConfetti /\ confetti <- useState'
-  useEffect (Store.subscribe gemini)
-    $ \gemini -> do
-        startTime <- Store.read scrambleTime
-        case startTime of
-          Just start ->
-            when (isSolvedFast gemini) do
-              now <- Now.now
-              setSolveTime $ (Instant.diff now start :: Milliseconds)
-              pushConfetti FadeIn
-          Nothing ->
-            pure unit
-
-  useAff confetti
-    $ case _ of
-        FadeIn -> do
-          liftEffect $ Console.log "fade in"
-          delay $ Milliseconds 1000.0
-          liftEffect $ pushConfetti FadeOut
-        FadeOut -> do
-          liftEffect $ Console.log "fade out"
-          delay $ Milliseconds 1000.0
-          liftEffect $ pushConfetti Off
-        Off -> do
-          liftEffect $ Console.log "off"
-
-  let resize = Resize.observe
-  domInfo <- useRef initialDomInfo $ bindToEffect resize.event $ const loadDomInfo
-
-  continuation { resize, gemini, drag, domInfo, solveTime, scrambleTime, confetti }
+type Breed =
+  { name :: String
+  , subBreeds :: Array String
+  }
 
 component :: Nut
 component = Deku.do
-  props <- useAppState
   ( pursx ::
       _
         """
-          <div ~attrs~>
-            <div ~confettiAttrs~ >
-            </div>
-            <div class="mt-12 flex flex-col gap-12 items-center">
-              ~header~
-              ~puzzle~
-              ~footer~
-            </div>
-          </div>
+          <h2>Dog Breeds</h2>
+          <ul class="Breedlist" >
+            <li>
+              <a>Hound</a>
+              <ul class="sub-breed-list">
+                <<a>Hound</a>
+              </ul>
+            </li>
+          </ul>
         """
-  )
-    ~~
-      { header: header props
-      , confettiAttrs:
-          Class.name
-            [ pure "confetti"
-            , "fade-in" # Class.when (props.confetti <#> eq FadeIn)
-            , "fade-out" # Class.when (props.confetti <#> eq FadeOut)
-            ]
-      -- TODO: use oneOf, or whatever is more efficient
-      , attrs:
-          Class.name
-            [ pure "fixed w-full h-full flex justify-center"
-            , "cursor-grabbing" # Class.when
-                (Store.subscribe props.drag <#> isJust)
-            ]
-            <|> autoFocus
-            <|> tabIndex (pure 0)
-            <|> (D.Self !:= \e -> props.resize.listen e)
-            <|> (D.OnKeydown !:= keyboard (keyboardEvents props))
-            -- | mouse controls
-            <|> (D.OnMousemove !:= mouse (onDragUpdate props))
-            <|> (D.OnMouseup !:= mouse (onDragEnd props))
-            <|> (D.OnMouseleave !:= mouse (onDragEnd props))
-            -- | touch controls
-            <|> (D.OnTouchmove !:= touch (onDragUpdate props))
-            <|> (D.OnTouchend !:= touch (onDragEnd props))
-            <|> (D.OnTouchcancel !:= touch (onDragEnd props))
-      , puzzle: Puzzle.component props
-      , footer
-      }
+  ) ~~ {}
 
 header ::
   forall rest.
@@ -142,6 +79,43 @@ header { gemini, scrambleTime } =
             now <- Now.now
             Store.set scrambleTime $ Just now
       }
+
+useAppState :: (_ -> _) -> Nut
+useAppState continuation = Deku.do
+  gemini <- useStore Gemini.initialGemini
+  drag <- useStore (Nothing :: _ Drag)
+  scrambleTime <- useStore Nothing
+  setSolveTime /\ solveTime <- useState'
+  pushConfetti /\ confetti <- useState'
+  useEffect (Store.subscribe gemini)
+    $ \gemini -> do
+        startTime <- Store.read scrambleTime
+        case startTime of
+          Just start ->
+            when (isSolvedFast gemini) do
+              now <- Now.now
+              setSolveTime $ (Instant.diff now start :: Milliseconds)
+              pushConfetti FadeIn
+          Nothing ->
+            pure unit
+
+  useAff confetti
+    $ case _ of
+        FadeIn -> do
+          liftEffect $ Console.log "fade in"
+          delay $ Milliseconds 1000.0
+          liftEffect $ pushConfetti FadeOut
+        FadeOut -> do
+          liftEffect $ Console.log "fade out"
+          delay $ Milliseconds 1000.0
+          liftEffect $ pushConfetti Off
+        Off -> do
+          liftEffect $ Console.log "off"
+
+  let resize = Resize.observe
+  domInfo <- useRef initialDomInfo $ bindToEffect resize.event $ const loadDomInfo
+
+  continuation { resize, gemini, drag, domInfo, solveTime, scrambleTime, confetti }
 
 footer :: Nut
 footer =
