@@ -1,4 +1,4 @@
-module Gemini.Component.App
+module DogBreed.Component.App
   ( component
   ) where
 
