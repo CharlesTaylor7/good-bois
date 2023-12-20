@@ -32,28 +32,44 @@ component = Deku.do
   ( pursx ::
       _
         """
-        <div>
-          <h2>Dog Breeds</h2>
-          <ul>
-            <li>
-              <a>Hound</a>
-              <ul>
-                <li>Basset</li>
-                <li>Daschan</li>
-              </ul>
-            </li>
+        <div class="flex flex-col items-center justify-center">
+          <h2 class="text-xl font-semibold">Dog Breeds</h2>
+          <ul class="pl-4 list-disc">
+              ~children~
           </ul>
         </div>
         """
-  ) ~~ {}
+  ) ~~
+    { children: dogBreedComponent { name: "Hound", subBreeds: [ "Basset", "Daschan" ] }
+    }
 
-header ::
-  forall rest.
-  { gemini :: Store Gemini
-  , scrambleTime :: Store (Maybe _)
-  | rest
-  } ->
-  Nut
+dogBreedComponent :: Breed -> Nut
+dogBreedComponent breed =
+  Deku.do
+    ( pursx ::
+        _
+          """
+            <li>
+              <a 
+                class="flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
+                ~breedAttrs~
+              >Hound</a>
+              <ul class="pl-4 list-disc">
+                ~subBreeds~
+              </ul>
+            </li>
+        """
+    )
+    ~~
+      { breedAttrs:
+          D.OnClick !:=
+            do
+              Console.log $ "Hello " <> breed.name
+
+      , subBreeds:
+          breed.subBreeds # foldMap (\name -> (pursx :: _ "<li>~name~</li>") ~~ { name: text_ name })
+      }
+
 header { gemini, scrambleTime } =
   ( pursx ::
       _
