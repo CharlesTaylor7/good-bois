@@ -1,6 +1,9 @@
 procs:
-  Test:
-    shell: watchexec -e purs,js,yaml --clear -- npm run test
+  Build:
+    shell: watchexec -e purs,js,yaml --clear -- npm run build
 
   Dev Server:
     shell: npm run watch:js
+
+  Test:
+    shell: watchexec -e purs,js,yaml --clear -- npm run test
