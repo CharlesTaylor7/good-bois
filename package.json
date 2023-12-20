@@ -7,9 +7,10 @@
   "type": "module",
   "scripts": {
     "postinstall": "spago install",
-    "test": "spago test",
+    "test": "spago test -p form-validation",
     "watch:js": "vite --port=3000",
-    "watch:purs": "watchexec -e purs,yaml,js -- spago build"
+    "watch:purs": "watchexec -e purs,yaml,js -- spago build",
+    "build:purs": "spago build"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",

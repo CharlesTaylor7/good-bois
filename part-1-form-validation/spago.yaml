@@ -1,0 +1,15 @@
+package:
+  name: form-validation
+  dependencies:
+    - effect
+    - partial
+    - prelude
+  test:
+    main: Test.Main
+    dependencies:
+      - spec
+      - spec-quickcheck
+      - quickcheck
+
+
+ 

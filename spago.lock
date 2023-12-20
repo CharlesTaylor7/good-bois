@@ -1,6 +1,6 @@
 workspace:
   packages:
-    gemini:
+    dog-breed-ui:
       path: ./
       dependencies:
         - aff
@@ -33,19 +33,17 @@ workspace:
         - web-dom
         - web-events
         - web-uievents
+      test_dependencies: []
+    form-validation:
+      path: part-1-form-validation
+      dependencies:
+        - effect
+        - partial
+        - prelude
       test_dependencies:
         - quickcheck
         - spec
         - spec-quickcheck
-    gemini-bench:
-      path: benchmark
-      dependencies:
-        - benchotron
-        - effect
-        - gemini
-        - partial
-        - prelude
-      test_dependencies: []
   package_set:
     registry: 36.3.0
   extra_packages:
@@ -190,11 +188,6 @@ packages:
       - foldable-traversable
       - lists
       - strings
-  arraybuffer-types:
-    type: registry
-    version: 3.0.2
-    integrity: sha256-mQKokysYVkooS4uXbO+yovmV/s8b138Ws3zQvOwIHRA=
-    dependencies: []
   arrays:
     type: registry
     version: 7.2.1
@@ -225,40 +218,6 @@ packages:
       - exceptions
       - functions
       - maybe
-  benchotron:
-    type: git
-    url: https://github.com/JordanMartinez/purescript-benchotron.git
-    rev: 0c5342db5caf4608e4c0eb199ec2de3cb95b7d4e
-    dependencies:
-      - ansi
-      - arrays
-      - datetime
-      - effect
-      - exceptions
-      - exists
-      - foldable-traversable
-      - formatters
-      - identity
-      - integers
-      - js-date
-      - lcg
-      - lists
-      - maybe
-      - node-buffer
-      - node-fs
-      - node-process
-      - node-readline
-      - node-streams
-      - now
-      - ordered-collections
-      - partial
-      - prelude
-      - profunctor
-      - quickcheck
-      - strings
-      - transformers
-      - tuples
-      - unfoldable
   bifunctors:
     type: registry
     version: 6.0.0
@@ -503,15 +462,6 @@ packages:
       - identity
       - lists
       - ordered-collections
-  fixed-points:
-    type: registry
-    version: 7.0.0
-    integrity: sha256-hTl5fzeG4mzAOFzEzAeNH7kJvJgYCH7x3v2NdX9pOE4=
-    dependencies:
-      - exists
-      - newtype
-      - prelude
-      - transformers
   foldable-traversable:
     type: registry
     version: 6.0.0
@@ -565,18 +515,6 @@ packages:
     integrity: sha256-X7u0SuCvFbLbzuNEKLBNuWjmcroqMqit4xEzpQwAP7E=
     dependencies:
       - aff
-  formatters:
-    type: registry
-    version: 7.0.0
-    integrity: sha256-5JaC9d2p0xoqJWjWxlHH19R4iJwFTBr4j7SlYcLgicE=
-    dependencies:
-      - datetime
-      - fixed-points
-      - lists
-      - numbers
-      - parsing
-      - prelude
-      - transformers
   free:
     type: registry
     version: 7.0.0
@@ -774,78 +712,6 @@ packages:
     dependencies:
       - prelude
       - safe-coerce
-  node-buffer:
-    type: registry
-    version: 8.0.0
-    integrity: sha256-RwOTB8yTS4Jjqc55JqxRcVaMXP+cYJ5aww0XH1Z/I8A=
-    dependencies:
-      - arraybuffer-types
-      - effect
-      - maybe
-      - st
-      - unsafe-coerce
-  node-fs:
-    type: registry
-    version: 8.2.0
-    integrity: sha256-6X/8KFH5qAF15UDrMadoyAMZxd08bs9IF2XrVgvpH2I=
-    dependencies:
-      - datetime
-      - effect
-      - either
-      - enums
-      - exceptions
-      - functions
-      - integers
-      - js-date
-      - maybe
-      - node-buffer
-      - node-path
-      - node-streams
-      - nullable
-      - partial
-      - prelude
-      - strings
-      - unsafe-coerce
-  node-path:
-    type: registry
-    version: 5.0.0
-    integrity: sha256-pd82nQ+2l5UThzaxPdKttgDt7xlsgIDLpPG0yxDEdyE=
-    dependencies:
-      - effect
-  node-process:
-    type: registry
-    version: 10.0.0
-    integrity: sha256-YzUqf7HWkGEQVRmkxUpL1x2GzKqKLyEyR7mkP68xcZs=
-    dependencies:
-      - effect
-      - foreign-object
-      - maybe
-      - node-streams
-      - posix-types
-      - prelude
-      - unsafe-coerce
-  node-readline:
-    type: registry
-    version: 7.0.0
-    integrity: sha256-zlJEPH1/nbRYuEaLXIaHiuHjMWXC8GoTZJZjSSJCCeo=
-    dependencies:
-      - effect
-      - foreign
-      - node-process
-      - node-streams
-      - options
-      - prelude
-  node-streams:
-    type: registry
-    version: 7.0.0
-    integrity: sha256-EGCA+hp6chlxDlQ8UG3RIaIIL1R0OckKnqP+KPAX1y4=
-    dependencies:
-      - effect
-      - either
-      - exceptions
-      - node-buffer
-      - nullable
-      - prelude
   nonempty:
     type: registry
     version: 7.0.0
@@ -879,16 +745,6 @@ packages:
     dependencies:
       - functions
       - maybe
-  options:
-    type: registry
-    version: 7.0.0
-    integrity: sha256-treC6h+jvzcWhplPaF/aMENCOx+JGk+ysa5pL1BGHtg=
-    dependencies:
-      - contravariant
-      - foreign
-      - foreign-object
-      - maybe
-      - tuples
   ordered-collections:
     type: registry
     version: 3.1.0
@@ -928,36 +784,6 @@ packages:
       - profunctor
       - refs
       - transformers
-  parsing:
-    type: registry
-    version: 10.2.0
-    integrity: sha256-ZDIdMFAKkst57x6BVa1aUWJnS8smoZnXsZ339Aq1mPA=
-    dependencies:
-      - arrays
-      - control
-      - effect
-      - either
-      - enums
-      - foldable-traversable
-      - functions
-      - identity
-      - integers
-      - lazy
-      - lists
-      - maybe
-      - newtype
-      - nullable
-      - numbers
-      - partial
-      - prelude
-      - st
-      - strings
-      - tailrec
-      - transformers
-      - tuples
-      - unfoldable
-      - unicode
-      - unsafe-coerce
   partial:
     type: registry
     version: 4.0.0
@@ -975,13 +801,6 @@ packages:
       - tailrec
       - transformers
       - tuples
-  posix-types:
-    type: registry
-    version: 6.0.0
-    integrity: sha256-ZfFz8RR1lee/o/Prccyeut3Q+9tYd08mlR72sIh6GzA=
-    dependencies:
-      - maybe
-      - prelude
   prelude:
     type: registry
     version: 6.0.1
@@ -1224,14 +1043,6 @@ packages:
       - partial
       - prelude
       - tuples
-  unicode:
-    type: registry
-    version: 6.0.0
-    integrity: sha256-QJnTVZpmihEAUiMeYrfkusVoziJWp2hJsgi9bMQLue8=
-    dependencies:
-      - foldable-traversable
-      - maybe
-      - strings
   unsafe-coerce:
     type: registry
     version: 6.0.0

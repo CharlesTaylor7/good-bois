@@ -1,5 +1,5 @@
 package:
-  name: gemini
+  name: dog-breed-ui
   dependencies:
     - aff
     - arrays
@@ -35,13 +35,6 @@ package:
     censor_package_warnings:
       - WildCardInferredType
       - ShadowedName
-  test:
-    main: Test.Main
-    dependencies:
-      - spec
-      - spec-quickcheck
-      - quickcheck
-
 workspace:
   lock: true
   build_opts:
