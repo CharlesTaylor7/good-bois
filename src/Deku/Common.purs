@@ -11,7 +11,7 @@ module Deku.Common
 
 import Deku.Attribute (class Attr, attr, xdata, (!:=))
 import Deku.Attributes (klass, klass_, style, style_)
-import Deku.Control (text, text_)
+import Deku.Control (text, text_, (<#~>))
 import Deku.Core (Nut)
 import Deku.Extra as Extra
 import Deku.Hooks (useAff, useEffect, useRef, useState, useState')

@@ -16,6 +16,3 @@ bindToEffect e f =
 
 monitor :: forall a. DebugWarning => String -> Event a -> Event a
 monitor tag event = event `bindToEffect` \a -> pure $ spy tag a
-
--- Technically a side effect, but this value is static for the whole run of the application
-foreign import isTouchDevice :: Boolean

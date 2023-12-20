@@ -2,13 +2,12 @@ module DogBreed.Component.App
   ( component
   ) where
 
-import Deku.Common
 import Prelude
 
+import Data.Foldable (foldMap)
 import Data.Map (Map)
-import Data.Monoid (foldMap)
 import Data.Tuple.Nested ((/\))
-import Deku.Control ((<#~>))
+import Deku.Common (Nut, pursx, text_, (!:=), (<#~>), (~~))
 import Deku.DOM as D
 import Deku.Do as Deku
 import Deku.Hooks (useState)
