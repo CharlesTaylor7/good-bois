@@ -20,15 +20,10 @@ import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Console as Console
 import FRP.Event as FRP
-import Fetch (fetch)
-import Fetch.Argonaut.Json as Json
 import Foreign.Object as FO
 import Record as Record
 import Type.Proxy (Proxy(..))
 
-type DogBreedResponse =
-  { message :: FO.Object (Array String)
-  }
 
 component :: Nut
 component = Deku.do
@@ -36,12 +31,6 @@ component = Deku.do
   setBreeds /\ breeds <- useState (Loading :: ApiResult (Array Breed))
 
   useAff (pure unit) $ \_ -> do
-    { json } <- fetch "https://dog.ceo/api/breeds/list/all" {}
-    { message } :: DogBreedResponse <- Json.fromJson json
-    liftEffect $ setBreeds $ Success $
-      (FO.toAscUnfoldable message :: Array _) <#> \(name /\ subBreeds) ->
-        { name, subBreeds }
-
   -- TODO:
   -- image cache
 
