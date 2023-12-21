@@ -1,7 +1,5 @@
-module DogBreed.Component.Details
-  ( component
-  ) where
-
+module DogBreed.Component.Details where
+{-
 import Prelude
 
 import Data.Foldable (foldMap)
@@ -49,3 +47,4 @@ component props = Deku.do
         props.setPage BreedListPage
     }
 
+-}

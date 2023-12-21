@@ -12,6 +12,8 @@ workspace:
         - deku
         - effect
         - enums
+        - fetch
+        - fetch-argonaut
         - filterable
         - foldable-traversable
         - hyrule
@@ -188,6 +190,59 @@ packages:
       - foldable-traversable
       - lists
       - strings
+  argonaut:
+    type: registry
+    version: 9.0.0
+    integrity: sha256-9sHzkzcFkaMUa9+3FjIybJDYnHtY4Jp4zHOJ84qPTXo=
+    dependencies:
+      - argonaut-codecs
+      - argonaut-core
+      - argonaut-traversals
+  argonaut-codecs:
+    type: registry
+    version: 9.1.0
+    integrity: sha256-N6efXByUeg848ompEqJfVvZuZPfdRYDGlTDFn0G0Oh8=
+    dependencies:
+      - argonaut-core
+      - arrays
+      - effect
+      - foreign-object
+      - identity
+      - integers
+      - maybe
+      - nonempty
+      - ordered-collections
+      - prelude
+      - record
+  argonaut-core:
+    type: registry
+    version: 7.0.0
+    integrity: sha256-RC82GfAjItydxrO24cdX373KHVZiLqybu19b5X8u7B4=
+    dependencies:
+      - arrays
+      - control
+      - either
+      - foreign-object
+      - functions
+      - gen
+      - maybe
+      - nonempty
+      - prelude
+      - strings
+      - tailrec
+  argonaut-traversals:
+    type: registry
+    version: 10.0.0
+    integrity: sha256-9nSfqR70rjiNWVVsCoK+jrm9dmyZTx89IKNYO6uNUIk=
+    dependencies:
+      - argonaut-codecs
+      - argonaut-core
+      - profunctor-lenses
+  arraybuffer-types:
+    type: registry
+    version: 3.0.2
+    integrity: sha256-mQKokysYVkooS4uXbO+yovmV/s8b138Ws3zQvOwIHRA=
+    dependencies: []
   arrays:
     type: registry
     version: 7.2.1
@@ -451,6 +506,64 @@ packages:
       - tuples
       - unfoldable
       - unsafe-coerce
+  fetch:
+    type: registry
+    version: 2.0.0
+    integrity: sha256-43ojzk1qxr5EUTuRmL8R4Fnqd0V3uXFhL5lWCytaer0=
+    dependencies:
+      - aff
+      - arraybuffer-types
+      - effect
+      - fetch-core
+      - foreign
+      - http-methods
+      - js-promise-aff
+      - newtype
+      - prelude
+      - record
+      - typelevel-prelude
+      - web-file
+      - web-streams
+  fetch-argonaut:
+    type: registry
+    version: 1.0.1
+    integrity: sha256-tQwOBM5JbuXwPVOBDeREEdvXhY0eioFDqLWBMl1LkYo=
+    dependencies:
+      - aff
+      - argonaut
+      - console
+      - effect
+      - either
+      - foreign
+      - prelude
+      - transformers
+      - unsafe-coerce
+  fetch-core:
+    type: registry
+    version: 5.1.0
+    integrity: sha256-mBifgiz5g2QhyCHeYn/A6M6+7FWEw63KxXN+UWFHX/o=
+    dependencies:
+      - arraybuffer-types
+      - arrays
+      - console
+      - effect
+      - foldable-traversable
+      - foreign
+      - foreign-object
+      - functions
+      - http-methods
+      - js-promise
+      - maybe
+      - newtype
+      - nullable
+      - prelude
+      - record
+      - tuples
+      - typelevel-prelude
+      - unfoldable
+      - unsafe-coerce
+      - web-file
+      - web-streams
   filterable:
     type: registry
     version: 5.0.0
@@ -573,6 +686,14 @@ packages:
       - tailrec
       - tuples
       - unfoldable
+  http-methods:
+    type: registry
+    version: 6.0.0
+    integrity: sha256-Orr7rbDGcp7qoqmUMXPRMjBx+C4jqOQcFe9+gE3nMgU=
+    dependencies:
+      - either
+      - prelude
+      - strings
   hyrule:
     type: registry
     version: 2.3.8
@@ -638,6 +759,25 @@ packages:
       - foreign
       - integers
       - now
+  js-promise:
+    type: registry
+    version: 1.0.0
+    integrity: sha256-kXNo5g9RJgPdrTuKRe5oG2kBIwPp+j5VDPDplqZBJzQ=
+    dependencies:
+      - effect
+      - exceptions
+      - foldable-traversable
+      - functions
+      - maybe
+      - prelude
+  js-promise-aff:
+    type: registry
+    version: 1.0.0
+    integrity: sha256-s9kml9Ei74hKlMMg41yyZp4GkbmYUwaH+gBWWrdhwec=
+    dependencies:
+      - aff
+      - foreign
+      - js-promise
   js-timers:
     type: registry
     version: 6.1.0
@@ -818,6 +958,31 @@ packages:
       - invariant
       - newtype
       - prelude
+      - tuples
+  profunctor-lenses:
+    type: registry
+    version: 8.0.0
+    integrity: sha256-K7f29rHRHgVSb2Y/PaSKtfYPriP6n87BJNO7EhsZHas=
+    dependencies:
+      - arrays
+      - bifunctors
+      - const
+      - control
+      - distributive
+      - either
+      - foldable-traversable
+      - foreign-object
+      - functors
+      - identity
+      - lists
+      - maybe
+      - newtype
+      - ordered-collections
+      - partial
+      - prelude
+      - profunctor
+      - record
+      - transformers
       - tuples
   quickcheck:
     type: registry
@@ -1093,6 +1258,18 @@ packages:
     dependencies:
       - nullable
       - web-events
+  web-streams:
+    type: registry
+    version: 4.0.0
+    integrity: sha256-02HgXIk6R+pU9fWOX42krukAI1QkCbLKcCv3b4Jq6WI=
+    dependencies:
+      - arraybuffer-types
+      - effect
+      - exceptions
+      - js-promise
+      - nullable
+      - prelude
+      - tuples
   web-uievents:
     type: registry
     version: 4.0.0

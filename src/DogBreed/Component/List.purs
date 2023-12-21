@@ -1,5 +1,6 @@
 module DogBreed.Component.List where
 
+{-
 import Prelude
 
 import Data.Foldable (foldMap)
@@ -76,3 +77,4 @@ dogBreedComponent props =
           props.breed.subBreeds # foldMap (\name -> (pursx :: _ "<li>~name~</li>") ~~ { name: text_ name })
 
       }
+-}

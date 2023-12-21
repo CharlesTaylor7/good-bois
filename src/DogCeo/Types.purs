@@ -1,4 +1,4 @@
-module DogBreed.Types
+module DogCeo.Types
   ( Breed
   , Page(..)
   , ImageMap

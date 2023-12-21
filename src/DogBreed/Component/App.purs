@@ -1,6 +1,5 @@
-module DogBreed.Component.App
-  ( component
-  ) where
+module DogBreed.Component.App where
+{-
 
 import Prelude
 import Utils
@@ -52,3 +51,4 @@ component = Deku.do
       ListPage.component props
     BreedDetailsPage breed ->
       DetailsPage.component $ Record.insert (Proxy :: _ "breed") breed props
+      -}
