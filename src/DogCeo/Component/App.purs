@@ -8,8 +8,9 @@ import Data.Map (Map)
 import Data.Map as Map
 import Data.Newtype (wrap)
 import DogCeo.Component.Breeds as ListView
+import DogCeo.Component.Images as DetailsView
 import DogCeo.Types (ApiResult(..), Breed, Page(..))
-import Effect.Aff.Class (class MonadAff, liftAff)
+import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -18,7 +19,7 @@ import Type.Proxy (Proxy(..))
 
 type Slots =
   ( listView :: ListView.Slot
-  , detailsView :: forall query output. H.Slot query output Unit
+  , detailsView :: DetailsView.Slot
   )
 
 _listView = Proxy :: Proxy "listView"
@@ -31,8 +32,8 @@ type State =
   }
 
 data Action
-  = Increment
-  | HandleBreedList ListView.Output
+  = HandleListView ListView.Output
+  | HandleDetailsView DetailsView.Output
 
 component :: forall query input output monad. MonadAff monad => H.Component query input output monad
 component =
@@ -57,42 +58,15 @@ render state =
     [ HP.class_ $ wrap "mt-3 flex flex-col justify-center items-center" ]
     [ case state.page of
         BreedsPage ->
-          HH.slot _listView unit ListView.component unit HandleBreedList
-
-        --HH.text "Breeds - Coming soon"
-
+          HH.slot _listView unit ListView.component unit HandleListView
         ImagesPage { breed } ->
-          HH.div
-            []
-            [ HH.text "Images - Coming soon"
-            , HH.text breed
-            ]
-
+          HH.slot _detailsView unit DetailsView.component { breed } HandleDetailsView
     ]
-
--- button example
-{-
-
-let
-  label = show state.counter
-in
-  hh.div
-    [ hp.class_ $ wrap "mt-3 flex flex-col justify-center items-center" ]
-
-    [ HH.button
-        [ HP.title label
-        , HE.onClick \_ -> Increment
-        , HP.class_ $ wrap "border rounded-lg py-1 px-3 bg-sky-300"
-        ]
-        [ HH.text label ]
-    ]
-    -}
 
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
-  Increment ->
-    pure unit
-
-  HandleBreedList (ListView.Clicked { breed }) ->
+  HandleListView (ListView.Clicked { breed }) ->
     H.modify_ \state -> state { page = ImagesPage { breed } }
 
+  HandleDetailsView DetailsView.ToListView ->
+    H.modify_ \state -> state { page = BreedsPage }

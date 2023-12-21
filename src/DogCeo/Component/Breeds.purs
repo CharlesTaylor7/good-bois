@@ -69,27 +69,6 @@ render state =
                 ]
     ]
 
-{-
-
-          <h2 class="text-xl font-semibold">Dog Breeds</h2>
-          <ul class="pl-4 list-disc">
-              ~children~
-          </ul>
- 
-<li>
-              <a 
-                class="flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
-                ~onClick~
-              >
-                ~name~
-             
-
-   -}
-
-type DogBreedResponse =
-  { message :: FO.Object (Array String)
-  }
-
 handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
 handleAction = case _ of
   FetchBreeds -> do
