@@ -14,8 +14,8 @@ data ApiResult a
   | Success a
 
 data Page
-  = BreedListPage
-  | BreedDetailsPage String
+  = BreedsPage
+  | ImagesPage { breed :: String }
 
 type Breed =
   { name :: String
