@@ -39,7 +39,6 @@ render _state =
   HH.div
     []
     [ HH.h2 [ HP.class_ $ wrap "text-xl font-semibold" ] [ HH.text "Dog Images" ]
-    , HH.text "coming soon"
 
     , HH.a
         [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
