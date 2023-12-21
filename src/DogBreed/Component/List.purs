@@ -27,11 +27,7 @@ component props = Deku.do
       _
         """
         <div class="flex flex-col items-center justify-center">
-          <h2 class="text-xl font-semibold">Dog Breeds</h2>
-          <ul class="pl-4 list-disc">
-              ~children~
-          </ul>
-        </div>
+       </div>
         """
   ) ~~
     { children:
@@ -54,16 +50,7 @@ dogBreedComponent props =
     ( pursx ::
         _
           """
-            <li>
-              <a 
-                class="flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
-                ~onClick~
-              >
-                ~name~
-              </a>
-              <ul class="pl-4 list-disc">
-                ~subBreeds~
-              </ul>
+             </a>
             </li>
         """
     )

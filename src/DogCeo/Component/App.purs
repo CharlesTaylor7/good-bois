@@ -9,6 +9,7 @@ import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.Tuple.Nested ((/\))
+import DogCeo.Component.Breeds as ListView
 import DogCeo.Types (ApiResult(..), Breed, Page(..))
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Fetch (fetch)
@@ -21,23 +22,20 @@ import Halogen.HTML.Properties as HP
 import Type.Proxy (Proxy(..))
 
 type Slots =
-  ( listView :: forall query. H.Slot query Void Int
-  , detailsView :: forall query. H.Slot query Void Int
+  ( listView :: forall query. H.Slot query Void Unit
+  , detailsView :: forall query. H.Slot query Void Unit
   )
 
 _listView = Proxy :: Proxy "listView"
 _detailsView = Proxy :: Proxy "detailsView"
 
 type State =
-  { counter :: Int
-  , breeds :: ApiResult (Array Breed)
+  { breeds :: ApiResult (Array Breed)
   , images :: Map String (Array String)
   , page :: Page
   }
 
-data Action
-  = Increment
-  | FetchBreeds
+data Action = Increment
 
 component :: forall query input output monad. MonadAff monad => H.Component query input output monad
 component =
@@ -46,25 +44,25 @@ component =
     , render
     , eval: H.mkEval $ H.defaultEval
         { handleAction = handleAction
-        , initialize = Just FetchBreeds
         }
     }
 
 initialState :: forall input. input -> State
 initialState _ =
-  { counter: 0
-  , breeds: Loading
+  { breeds: Loading
   , images: Map.empty
   , page: BreedsPage
   }
 
-render :: forall monad. State -> H.ComponentHTML Action () monad
+render :: forall monad. MonadAff monad => State -> H.ComponentHTML Action Slots monad
 render state =
   HH.div
     [ HP.class_ $ wrap "mt-3 flex flex-col justify-center items-center" ]
     [ case state.page of
         BreedsPage ->
-          HH.text "Breeds - Coming soon"
+          HH.slot_ _listView unit ListView.component unit
+
+        --HH.text "Breeds - Coming soon"
 
         ImagesPage { breed } ->
           HH.div
@@ -97,22 +95,6 @@ type DogBreedResponse =
   { message :: FO.Object (Array String)
   }
 
-handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action () output monad Unit
+handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
-  Increment ->
-    H.modify_ \state -> state { counter = state.counter + 1 }
-
-  FetchBreeds -> do
-    { message } <- liftAff $ do
-      { json } <- fetch "https://dog.ceo/api/breeds/list/all" {}
-      response :: DogBreedResponse <- Json.fromJson json
-      pure response
-
-    H.modify_ \state -> state
-      { breeds =
-          Success $
-            (FO.toAscUnfoldable message :: Array _)
-              <#> \(name /\ subBreeds) ->
-                { name, subBreeds }
-      }
-
+  Increment -> pure unit
