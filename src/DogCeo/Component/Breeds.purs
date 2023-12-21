@@ -10,10 +10,8 @@ import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.Tuple.Nested ((/\))
 import DogCeo.Api.Breeds as BreedsApi
-import DogCeo.Types (ApiResult(..), Breed, Page(..))
-import Effect.Aff.Class (class MonadAff, liftAff)
-import Fetch (fetch)
-import Fetch.Argonaut.Json as Json
+import DogCeo.Types (ApiResult, Breed)
+import Effect.Aff.Class (class MonadAff)
 import Foreign.Object as FO
 import Halogen as H
 import Halogen.HTML as HH
@@ -56,7 +54,9 @@ render state =
           HH.ul [ HP.class_ $ wrap "pl-4 list-disc" ] $
             breeds <#> \breed ->
               HH.li []
-                [ HH.text breed.name
+                [ HH.a
+                    [ HP.class_ $ wrap "flex cursor-pointer underline decoration-blue-400 text-sky-500" ]
+                    [ HH.text breed.name ]
                 , HH.ul [] $
                     breed.subBreeds <#> \name ->
                       HH.li [] [ HH.text name ]
