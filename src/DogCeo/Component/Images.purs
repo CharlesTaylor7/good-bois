@@ -30,7 +30,9 @@ type State =
   , images :: ApiResult (Array String)
   }
 
-data Action = Breadcrumb
+data Action
+  = Breadcrumb
+  | Receive Input
 
 component :: forall query monad. MonadAff monad => H.Component query Input Output monad
 component =
@@ -39,6 +41,7 @@ component =
     , render
     , eval: H.mkEval $ H.defaultEval
         { handleAction = handleAction
+        , receive = Just <<< Receive
         }
     }
 
@@ -72,3 +75,5 @@ handleAction =
   case _ of
     Breadcrumb -> H.raise ToListView
 
+    Receive input ->
+      H.modify_ $ Record.merge input
