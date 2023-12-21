@@ -12,14 +12,14 @@ import Fetch as Fetch
 import Fetch.Argonaut.Json as Json
 
 fetch :: forall monad. MonadAff monad => Breed -> monad (ApiResult (Array String))
-fetch { breed, subBreed } = liftAff $ do
+fetch { name, subBreed } = liftAff $ do
   { json } <- Fetch.fetch url {}
   { message: images } :: DogImagesResponse <- Json.fromJson json
   pure $ Success images
   where
   url = fold
     [ "https://dog.ceo/api/breed/"
-    , breed
+    , name
     , subBreed # maybe "" ("/" <> _)
     , "/images"
     ]

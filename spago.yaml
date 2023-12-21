@@ -2,37 +2,17 @@ package:
   name: dog-breed-ui
   dependencies:
     - aff
-    - arrays
-    - console
-    - control
-    - datetime
-    - debug
     - effect
-    - enums
     - fetch
     - fetch-argonaut
-    - filterable
     - foldable-traversable
+    - foreign-object
     - halogen
-    - hyrule
-    - integers
-    - js-date
-    - lists
     - maybe
-    - numbers
+    - newtype
     - ordered-collections
-    - partial
     - prelude
-    - random
-    - safe-coerce
-    - st
-    - strings
     - tuples
-    - unfoldable
-    - unsafe-coerce
-    - web-dom
-    - web-events
-    - web-uievents
   build:
     censor_package_warnings:
       - WildCardInferredType

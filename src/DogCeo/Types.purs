@@ -17,7 +17,7 @@ data ApiResult a
 
 data Page
   = BreedsPage
-  | ImagesPage { breed :: String }
+  | ImagesPage { breed :: Breed }
 
 type BreedGroup =
   { name :: String
@@ -29,4 +29,4 @@ type Breed =
   , subBreed :: Maybe String
   }
 
-type ImageMap = Map String (Array String)
+type ImageMap = Map Breed (Array String)
