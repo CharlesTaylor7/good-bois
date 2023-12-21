@@ -6,15 +6,10 @@ import Prelude
 
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
-import Data.Tuple.Nested ((/\))
 import DogCeo.Component.Breeds as ListView
 import DogCeo.Types (ApiResult(..), Breed, Page(..))
 import Effect.Aff.Class (class MonadAff, liftAff)
-import Fetch (fetch)
-import Fetch.Argonaut.Json as Json
-import Foreign.Object as FO
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -22,8 +17,8 @@ import Halogen.HTML.Properties as HP
 import Type.Proxy (Proxy(..))
 
 type Slots =
-  ( listView :: forall query. H.Slot query Void Unit
-  , detailsView :: forall query. H.Slot query Void Unit
+  ( listView :: ListView.Slot
+  , detailsView :: forall query output. H.Slot query output Unit
   )
 
 _listView = Proxy :: Proxy "listView"
@@ -35,7 +30,9 @@ type State =
   , page :: Page
   }
 
-data Action = Increment
+data Action
+  = Increment
+  | HandleBreedList ListView.Output
 
 component :: forall query input output monad. MonadAff monad => H.Component query input output monad
 component =
@@ -60,7 +57,7 @@ render state =
     [ HP.class_ $ wrap "mt-3 flex flex-col justify-center items-center" ]
     [ case state.page of
         BreedsPage ->
-          HH.slot_ _listView unit ListView.component unit
+          HH.slot _listView unit ListView.component unit HandleBreedList
 
         --HH.text "Breeds - Coming soon"
 
@@ -93,4 +90,9 @@ in
 
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
-  Increment -> pure unit
+  Increment ->
+    pure unit
+
+  HandleBreedList (ListView.Clicked { breed }) ->
+    H.modify_ \state -> state { page = ImagesPage { breed } }
+

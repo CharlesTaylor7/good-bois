@@ -1,31 +1,35 @@
 module DogCeo.Component.Breeds
   ( component
+  , Output(..)
+  , Slot
   ) where
 
 import Prelude
 
-import Data.Map (Map)
-import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
-import Data.Tuple.Nested ((/\))
 import DogCeo.Api.Breeds as BreedsApi
-import DogCeo.Types (ApiResult, Breed)
+import DogCeo.Types (ApiResult(..), Breed)
 import Effect.Aff.Class (class MonadAff)
 import Foreign.Object as FO
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Type.Proxy (Proxy(..))
+
+data Output = Clicked { breed :: String }
+
+type Slot = forall query. H.Slot query Output Unit
 
 type State =
   { breeds :: ApiResult (Array Breed)
   }
 
-data Action = FetchBreeds
+data Action
+  = FetchBreeds
+  | Click { breed :: String }
 
-component :: forall query input output monad. MonadAff monad => H.Component query input output monad
+component :: forall query input monad. MonadAff monad => H.Component query input Output monad
 component =
   H.mkComponent
     { initialState
@@ -55,9 +59,11 @@ render state =
             breeds <#> \breed ->
               HH.li []
                 [ HH.a
-                    [ HP.class_ $ wrap "flex cursor-pointer underline decoration-blue-400 text-sky-500" ]
+                    [ HP.class_ $ wrap "flex cursor-pointer underline decoration-blue-400 text-sky-500"
+                    , HE.onClick \_ -> Click { breed: breed.name }
+                    ]
                     [ HH.text breed.name ]
-                , HH.ul [] $
+                , HH.ul [ HP.class_ $ wrap "pl-4 list-disc" ] $
                     breed.subBreeds <#> \name ->
                       HH.li [] [ HH.text name ]
                 ]
@@ -78,35 +84,17 @@ render state =
                 ~name~
              
 
-              <ul class="pl-4 list-disc">
-                ~subBreeds~
-              </ul>
    -}
--- button example
-{-
-
-let
-  label = show state.counter
-in
-  hh.div
-    [ hp.class_ $ wrap "mt-3 flex flex-col justify-center items-center" ]
-
-    [ HH.button
-        [ HP.title label
-        , HE.onClick \_ -> Increment
-        , HP.class_ $ wrap "border rounded-lg py-1 px-3 bg-sky-300"
-        ]
-        [ HH.text label ]
-    ]
-    -}
 
 type DogBreedResponse =
   { message :: FO.Object (Array String)
   }
 
-handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action () output monad Unit
+handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
 handleAction = case _ of
   FetchBreeds -> do
     breeds <- BreedsApi.fetch
     H.modify_ \state -> state
       { breeds = breeds }
+
+  Click args -> H.raise $ Clicked args
