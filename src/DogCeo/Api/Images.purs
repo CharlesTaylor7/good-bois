@@ -5,17 +5,17 @@ module DogCeo.Api.Images
 import Prelude
 
 import Data.Foldable (fold)
-import Data.Maybe (Maybe, maybe)
-import DogCeo.Types (ApiResult(..), Breed)
+import Data.Maybe (maybe)
+import DogCeo.Types (Breed)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Fetch as Fetch
 import Fetch.Argonaut.Json as Json
 
-fetch :: forall monad. MonadAff monad => Breed -> monad (ApiResult (Array String))
+fetch :: forall monad. MonadAff monad => Breed -> monad (Array String)
 fetch { name, subBreed } = liftAff $ do
   { json } <- Fetch.fetch url {}
   { message: images } :: DogImagesResponse <- Json.fromJson json
-  pure $ Success images
+  pure images
   where
   url = fold
     [ "https://dog.ceo/api/breed/"

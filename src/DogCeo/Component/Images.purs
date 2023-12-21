@@ -6,23 +6,29 @@ module DogCeo.Component.Images
 
 import Prelude
 
+import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
-import DogCeo.Types (Breed)
+import DogCeo.Types (ApiResult(..), Breed)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Record as Record
 
 type Input =
   { breed :: Breed
+  , images :: ApiResult (Array String)
   }
 
 data Output = ToListView
 
 type Slot = forall query. H.Slot query Output Unit
 
-type State = {}
+type State =
+  { breed :: Breed
+  , images :: ApiResult (Array String)
+  }
 
 data Action = Breadcrumb
 
@@ -37,7 +43,7 @@ component =
     }
 
 initialState :: Input -> State
-initialState _ = {}
+initialState input = Record.merge input {}
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
 render _state =
@@ -57,3 +63,4 @@ handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State
 handleAction =
   case _ of
     Breadcrumb -> H.raise ToListView
+

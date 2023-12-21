@@ -82,6 +82,6 @@ handleAction = case _ of
   FetchBreeds -> do
     breeds <- BreedsApi.fetch
     H.modify_ \state -> state
-      { breeds = breeds }
+      { breeds = Success breeds }
 
   Select breed -> H.raise $ Selected breed

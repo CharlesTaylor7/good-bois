@@ -5,7 +5,7 @@ module DogCeo.Api.Breeds
 import Prelude
 
 import Data.Tuple.Nested ((/\))
-import DogCeo.Types (ApiResult(..), BreedGroup)
+import DogCeo.Types (BreedGroup)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Fetch as Fetch
 import Fetch.Argonaut.Json as Json
@@ -15,11 +15,11 @@ type DogBreedResponse =
   { message :: FO.Object (Array String)
   }
 
-fetch :: forall monad. MonadAff monad => monad (ApiResult (Array BreedGroup))
+fetch :: forall monad. MonadAff monad => monad (Array BreedGroup)
 fetch = liftAff $ do
   { json } <- Fetch.fetch "https://dog.ceo/api/breeds/list/all" {}
   { message } :: DogBreedResponse <- Json.fromJson json
 
-  pure $ Success $ (FO.toAscUnfoldable message :: Array _)
+  pure $ (FO.toAscUnfoldable message :: Array _)
     <#> \(name /\ subBreeds) ->
       { name, subBreeds }

@@ -2,6 +2,7 @@ package:
   name: dog-breed-ui
   dependencies:
     - aff
+    - console
     - effect
     - fetch
     - fetch-argonaut
