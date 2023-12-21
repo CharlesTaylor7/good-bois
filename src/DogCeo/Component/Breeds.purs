@@ -9,6 +9,7 @@ import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.Tuple.Nested ((/\))
+import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Types (ApiResult(..), Breed, Page(..))
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Fetch (fetch)
@@ -106,16 +107,6 @@ type DogBreedResponse =
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action () output monad Unit
 handleAction = case _ of
   FetchBreeds -> do
-    { message } <- liftAff $ do
-      { json } <- fetch "https://dog.ceo/api/breeds/list/all" {}
-      response :: DogBreedResponse <- Json.fromJson json
-      pure response
-
+    breeds <- BreedsApi.fetch
     H.modify_ \state -> state
-      { breeds =
-          Success $
-            (FO.toAscUnfoldable message :: Array _)
-              <#> \(name /\ subBreeds) ->
-                { name, subBreeds }
-      }
-
+      { breeds = breeds }

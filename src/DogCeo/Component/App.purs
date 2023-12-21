@@ -91,10 +91,6 @@ in
     ]
     -}
 
-type DogBreedResponse =
-  { message :: FO.Object (Array String)
-  }
-
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
   Increment -> pure unit
