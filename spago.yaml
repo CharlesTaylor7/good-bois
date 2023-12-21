@@ -10,6 +10,8 @@ package:
     - deku
     - effect
     - enums
+    - fetch
+    - fetch-argonaut
     - filterable
     - foldable-traversable
     - hyrule
