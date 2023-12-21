@@ -9,25 +9,24 @@ import Prelude
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import DogCeo.Api.Breeds as BreedsApi
-import DogCeo.Types (ApiResult(..), Breed)
+import DogCeo.Types (ApiResult(..), Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)
-import Foreign.Object as FO
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 
-data Output = Clicked { breed :: String }
+data Output = Selected Breed
 
 type Slot = forall query. H.Slot query Output Unit
 
 type State =
-  { breeds :: ApiResult (Array Breed)
+  { breeds :: ApiResult (Array BreedGroup)
   }
 
 data Action
   = FetchBreeds
-  | Click { breed :: String }
+  | Select Breed
 
 component :: forall query input monad. MonadAff monad => H.Component query input Output monad
 component =
@@ -59,15 +58,24 @@ render state =
             breeds <#> \breed ->
               HH.li []
                 [ HH.a
-                    [ HP.class_ $ wrap "flex cursor-pointer underline decoration-blue-400 text-sky-500"
-                    , HE.onClick \_ -> Click { breed: breed.name }
+                    [ anchorStyle
+                    , HE.onClick \_ -> Select { name: breed.name, subBreed: Nothing }
                     ]
                     [ HH.text breed.name ]
                 , HH.ul [ HP.class_ $ wrap "pl-4 list-disc" ] $
                     breed.subBreeds <#> \name ->
-                      HH.li [] [ HH.text name ]
+                      HH.li []
+                        [ HH.a
+                            [ anchorStyle
+                            , HE.onClick \_ -> Select { name: breed.name, subBreed: Just name }
+                            ]
+                            [ HH.text name ]
+                        ]
                 ]
     ]
+
+  where
+  anchorStyle = HP.class_ $ wrap "flex cursor-pointer underline decoration-blue-400 text-sky-500"
 
 handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
 handleAction = case _ of
@@ -76,4 +84,4 @@ handleAction = case _ of
     H.modify_ \state -> state
       { breeds = breeds }
 
-  Click args -> H.raise $ Clicked args
+  Select breed -> H.raise $ Selected breed

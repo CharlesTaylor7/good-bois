@@ -65,7 +65,7 @@ render state =
 
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
-  HandleListView (ListView.Clicked { breed }) ->
+  HandleListView (ListView.Selected breed) ->
     H.modify_ \state -> state { page = ImagesPage { breed } }
 
   HandleDetailsView DetailsView.ToListView ->

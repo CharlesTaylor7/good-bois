@@ -7,11 +7,16 @@ module DogCeo.Component.Images
 import Prelude
 
 import Data.Newtype (wrap)
+import DogCeo.Types (Breed)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+
+type Input =
+  { breed :: Breed
+  }
 
 data Output = ToListView
 
@@ -21,7 +26,7 @@ type State = {}
 
 data Action = Breadcrumb
 
-component :: forall query input monad. MonadAff monad => H.Component query input Output monad
+component :: forall query monad. MonadAff monad => H.Component query Input Output monad
 component =
   H.mkComponent
     { initialState
@@ -31,7 +36,7 @@ component =
         }
     }
 
-initialState :: forall input. input -> State
+initialState :: Input -> State
 initialState _ = {}
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
