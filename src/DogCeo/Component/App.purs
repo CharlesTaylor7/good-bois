@@ -7,12 +7,12 @@ import Prelude
 import Data.Either (Either(..))
 import Data.Map (Map)
 import Data.Map as Map
+import Data.Maybe (maybe)
 import Data.Newtype (wrap)
 import DogCeo.Api.Images as ImagesApi
 import DogCeo.Component.Breeds as ListView
 import DogCeo.Component.Images as ImagesPage
 import DogCeo.Types (ApiResult(..), Breed, Page(..))
-import Effect.Aff (forkAff, runAff_)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (liftEffect)
 import Effect.Console as Console
@@ -32,8 +32,8 @@ _detailsView = Proxy :: Proxy "detailsView"
 
 type State =
   { breeds :: ApiResult (Array Breed)
-  , imagesCache :: Map String (Array String)
-  , images :: ApiResult (Array String)
+  , imagesCache :: Map Breed (Array String)
+  --, images :: ApiResult (Array String)
   , page :: Page
   }
 
@@ -55,7 +55,6 @@ initialState :: forall input. input -> State
 initialState _ =
   { breeds: Loading
   , imagesCache: Map.empty
-  , images: Loading
   , page: BreedsPage
   }
 
@@ -67,26 +66,29 @@ render state =
         BreedsPage ->
           HH.slot _listView unit ListView.component unit HandleListView
         ImagesPage { breed } ->
-          HH.slot _detailsView unit ImagesPage.component { breed, images: state.images } HandleImagesPage
+          HH.slot _detailsView unit ImagesPage.component
+            { breed
+            , images:
+                state.imagesCache
+                  # Map.lookup breed
+                  # maybe Loading Success
+            }
+            HandleImagesPage
     ]
 
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
   HandleListView (ListView.Selected breed) -> do
+
     void $ H.fork $ do
       images <- ImagesApi.fetch breed
       H.modify_ \state -> state
-        { images = Success images }
+        { imagesCache =
+            state.imagesCache # Map.insert breed images
+        }
 
     H.modify_ \state -> state
       { page = ImagesPage { breed } }
 
   HandleImagesPage ImagesPage.ToListView ->
     H.modify_ \state -> state { page = BreedsPage }
-
-{-
-( case _ of
-          Left error -> Console.error $ show error
-          Right images -> H.modify_ \state -> state { images = images }
-      )
--}

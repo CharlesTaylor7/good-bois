@@ -46,7 +46,7 @@ initialState :: Input -> State
 initialState input = Record.merge input {}
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
-render _state =
+render state =
   HH.div
     []
     [ HH.h2 [ HP.class_ $ wrap "text-xl font-semibold" ] [ HH.text "Dog Images" ]
@@ -57,6 +57,14 @@ render _state =
         ]
         [ HH.text "Back to Breeds"
         ]
+    , case state.images of
+        Loading ->
+          HH.text "Loading..."
+
+        Success images ->
+          HH.div [ HP.class_ $ wrap "flex flex-col gap-2" ] $
+            images <#> \src ->
+              HH.img [ HP.src src ]
     ]
 
 handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
