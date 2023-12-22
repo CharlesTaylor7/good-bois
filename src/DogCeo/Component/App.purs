@@ -7,7 +7,7 @@ import Prelude
 import Data.Either (Either(..))
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (maybe)
+import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (wrap)
 import DogCeo.Api.Images as ImagesApi
 import DogCeo.Component.Breeds as ListView
