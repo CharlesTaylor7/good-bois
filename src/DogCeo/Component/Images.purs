@@ -10,6 +10,8 @@ import Data.Array as Array
 import Data.Enum (enumFromTo)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (wrap)
+import Data.Set (Set)
+import Data.Set as Set
 import DogCeo.Types (ApiResult(..), Breed)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -30,6 +32,7 @@ type Slot = forall query. H.Slot query Output Unit
 
 type State =
   { page :: Int
+  , failedImageLoads :: Set String
   | InputRow
   }
 
@@ -40,6 +43,7 @@ data Action
   | Receive Input
   | GotoPreviousPage
   | GotoNextPage
+  | ImageNotFound String
 
 component :: forall query monad. MonadAff monad => H.Component query Input Output monad
 component =
@@ -53,7 +57,11 @@ component =
     }
 
 initialState :: Input -> State
-initialState input = Record.merge input { page: 1 }
+initialState =
+  Record.merge
+    { page: 1
+    , failedImageLoads: Set.empty
+    }
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
@@ -125,7 +133,7 @@ render state =
 
         Success images ->
           HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
-            renderPageImages { page: state.page, images }
+            renderPageImages state images
     ]
 
   where
@@ -145,6 +153,10 @@ handleAction =
 
     GotoNextPage ->
       H.modify_ $ \state -> state { page = state.page + 1 }
+
+    ImageNotFound src ->
+      H.modify_ $ \state -> state
+        { failedImageLoads = state.failedImageLoads # Set.insert src }
 
 {-
   Pagination utilities
@@ -175,12 +187,11 @@ imageLimit = 20
 -- | Prefetching images allows images to swap out seemlessly after clicking the Next button.
 
 renderPageImages ::
-  forall w i.
-  { page :: Int
-  , images :: Array String
-  } ->
-  Array (HH.HTML w i)
-renderPageImages { page, images } =
+  forall monad.
+  State ->
+  Array String ->
+  Array (H.ComponentHTML Action () monad)
+renderPageImages { page, failedImageLoads } images =
   enumFromTo 1 imageLimit
     # Array.mapMaybe
         ( \i ->
@@ -197,7 +208,11 @@ renderPageImages { page, images } =
         [ HP.class_ $ wrap "inline-block" ]
         [ HH.img
             [ HP.src current
-            , HP.class_ $ wrap "object-cover h-96 rounded"
+            , HE.onError \_ -> ImageNotFound current
+            , HP.class_ $ wrap $ Array.intercalate " "
+                [ "object-cover h-96 rounded"
+                , if current `Set.member` failedImageLoads then "hidden" else ""
+                ]
             ]
         , HH.link
             [ HP.rel "prefetch"
