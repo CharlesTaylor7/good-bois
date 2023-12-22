@@ -2,7 +2,10 @@
 export default {
   content: ["src/**/*.purs"],
   theme: {
-    extend: {},
+    listStyleType: {
+      disc: 'disc',
+      circle: 'circle',
+    },
   },
   plugins: [],
 };

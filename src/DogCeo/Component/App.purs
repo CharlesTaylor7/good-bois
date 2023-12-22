@@ -60,21 +60,19 @@ initialState _ =
 
 render :: forall monad. MonadAff monad => State -> H.ComponentHTML Action Slots monad
 render state =
-  HH.div
-    [ HP.class_ $ wrap "mt-3 flex flex-col justify-center items-center" ]
-    [ case state.page of
-        BreedsPage ->
-          HH.slot _listView unit ListView.component unit HandleListView
-        ImagesPage { breed } ->
-          HH.slot _detailsView unit ImagesPage.component
-            { breed
-            , images:
-                state.imagesCache
-                  # Map.lookup breed
-                  # maybe Loading Success
-            }
-            HandleImagesPage
-    ]
+  case state.page of
+    BreedsPage ->
+      HH.slot _listView unit ListView.component unit HandleListView
+
+    ImagesPage { breed } ->
+      HH.slot _detailsView unit ImagesPage.component
+        { breed
+        , images:
+            state.imagesCache
+              # Map.lookup breed
+              # maybe Loading Success
+        }
+        HandleImagesPage
 
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of

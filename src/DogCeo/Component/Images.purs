@@ -93,7 +93,8 @@ currentPageImages { page, images } =
 handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
 handleAction =
   case _ of
-    Breadcrumb -> H.raise ToListView
+    Breadcrumb ->
+      H.raise ToListView
 
     Receive input ->
       H.modify_ $ Record.merge input
