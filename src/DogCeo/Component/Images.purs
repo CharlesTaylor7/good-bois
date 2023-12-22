@@ -8,10 +8,11 @@ import Prelude
 
 import Data.Array as Array
 import Data.Enum (enumFromTo)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.Set (Set)
 import Data.Set as Set
+import DogCeo.Component.Image as Image
 import DogCeo.Types (ApiResult(..), Breed)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -19,6 +20,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Record as Record
+import Type.Proxy (Proxy(..))
 
 type Input = Record InputRow
 
@@ -29,6 +31,7 @@ type InputRow =
   )
 
 type Slot = forall query. H.Slot query Output Unit
+type Slots = (image :: Image.Slot)
 
 type State =
   { page :: Int
@@ -63,7 +66,7 @@ initialState =
     , failedImageLoads: Set.empty
     }
 
-render :: forall monad. State -> H.ComponentHTML Action () monad
+render :: forall monad. State -> H.ComponentHTML Action Slots monad
 render state =
   HH.div
     []
@@ -139,7 +142,7 @@ render state =
   where
   buttonStyle = HP.class_ $ wrap "border rounded-lg py-2 px-4 bg-sky-300 disabled:bg-slate-200"
 
-handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
+handleAction :: forall monad. MonadAff monad => Action -> H.HalogenM State Action Slots Output monad Unit
 handleAction =
   case _ of
     NavBackToBreeds ->
@@ -185,38 +188,20 @@ imageLimit = 20
 -- | Each image is rendered alongside a <link> tag which prefetches the image which is exactly 20 indices ahead of it.
 -- | Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src. This means after clicking 'Next', you can see stale images from the previous page while the new image is loading.
 -- | Prefetching images allows images to swap out seemlessly after clicking the Next button.
-
 renderPageImages ::
-  forall monad.
+  forall action monad.
   State ->
   Array String ->
-  Array (H.ComponentHTML Action () monad)
-renderPageImages { page, failedImageLoads } images =
+  Array (HH.ComponentHTML action Slots monad)
+renderPageImages { page } images =
   enumFromTo 1 imageLimit
     # Array.mapMaybe
-        ( \i ->
-            let
-              current = (page - 1) * imageLimit + (i - 1)
-              next = current + imageLimit
-            in
-              ( Array.index images current <#>
-                  ({ current: _, next: Array.index images next })
-              )
-        )
-    <#> \{ current, next } ->
-      HH.span
-        [ HP.class_ $ wrap "inline-block" ]
-        [ HH.img
-            [ HP.src current
-            , HE.onError \_ -> ImageNotFound current
-            , HP.class_ $ wrap $ Array.intercalate " "
-                [ "object-cover h-96 rounded"
-                , if current `Set.member` failedImageLoads then "hidden" else ""
-                ]
-            ]
-        , HH.link
-            [ HP.rel "prefetch"
-            , HP.href $ next # fromMaybe ""
-            ]
-        ]
+        \i ->
+          let
+            currentIndex = (page - 1) * imageLimit + (i - 1)
+            nextIndex = currentIndex + imageLimit
+            next = Array.index images nextIndex
 
+          in
+            Array.index images currentIndex <#> \current ->
+              HH.slot_ (Proxy :: _ "image") i Image.component { current, next }

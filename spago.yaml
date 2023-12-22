@@ -4,6 +4,7 @@ package:
     - aff
     - arrays
     - effect
+    - enums
     - fetch
     - fetch-argonaut
     - foldable-traversable
