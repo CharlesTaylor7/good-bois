@@ -7,7 +7,8 @@ module DogCeo.Component.Images
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Enum (enumFromTo)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (wrap)
 import DogCeo.Types (ApiResult(..), Breed)
 import Effect.Aff.Class (class MonadAff)
@@ -124,12 +125,9 @@ render state =
 
         Success images ->
           HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
-            currentPageImages { page: state.page, images } <#> \src ->
-              HH.img
-                [ HP.src src
-                , HP.class_ $ wrap "object-cover h-96 rounded"
-                ]
+            renderPageImages { page: state.page, images }
     ]
+
   where
   buttonStyle = HP.class_ $ wrap "border rounded-lg py-2 px-4 bg-sky-300 disabled:bg-slate-200"
 
@@ -172,14 +170,38 @@ maxPage { images } =
 imageLimit :: Int
 imageLimit = 20
 
-currentPageImages ::
+-- | Each image is rendered alongside a <link> tag which prefetches the image which is exactly 20 indices ahead of it.
+-- | Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src. This means after clicking 'Next', you can see stale images from the previous page while the new image is loading.
+-- | Prefetching images allows images to swap out seemlessly after clicking the Next button.
+
+renderPageImages ::
+  forall w i.
   { page :: Int
   , images :: Array String
   } ->
-  Array String
-currentPageImages { page, images } =
-  Array.slice start end images
-  where
-  -- Note: the pages are indexed from 1
-  start = (page - 1) * 20
-  end = page * 20
+  Array (HH.HTML w i)
+renderPageImages { page, images } =
+  enumFromTo 1 imageLimit
+    # Array.mapMaybe
+        ( \i ->
+            let
+              current = (page - 1) * imageLimit + (i - 1)
+              next = current + imageLimit
+            in
+              ( Array.index images current <#>
+                  ({ current: _, next: Array.index images next })
+              )
+        )
+    <#> \{ current, next } ->
+      HH.span
+        [ HP.class_ $ wrap "inline-block" ]
+        [ HH.img
+            [ HP.src current
+            , HP.class_ $ wrap "object-cover h-96 rounded"
+            ]
+        , HH.link
+            [ HP.rel "prefetch"
+            , HP.href $ next # fromMaybe ""
+            ]
+        ]
+
