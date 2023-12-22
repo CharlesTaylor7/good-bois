@@ -11,7 +11,7 @@
     "watch:js": "vite --port=3000 public",
     "watch:purs": "watchexec -e purs,yaml,js -- npm run build",
     "build": "spago build -p dog-breed-ui",
-    "bundle": "vite build public --outDir=../dist && cp -r public/static dist/"
+    "bundle": "npm run build && vite build public --outDir=../dist && cp -r public/static dist/"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
