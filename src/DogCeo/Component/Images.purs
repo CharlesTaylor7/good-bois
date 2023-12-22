@@ -59,7 +59,7 @@ render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
   HH.div
     []
-    [ HH.div [ HP.class_ $ wrap "m-3 flex flex-row items-center justify-evenly " ]
+    [ HH.div [ HP.class_ $ wrap "m-6 flex flex-row items-center justify-evenly " ]
         [ HH.a
             [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
             , HE.onClick \_ -> Breadcrumb
@@ -109,13 +109,11 @@ render state =
           HH.text "Loading..."
 
         Success images ->
-          HH.div [ HP.class_ $ wrap "grid items-center justify-center grid-cols-4 gap-4" ] $
+          HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
             currentPageImages { page: state.page, images } <#> \src ->
               HH.img
                 [ HP.src src
-                --, HP.height 96
-                -- "96px"
-                , HP.class_ $ wrap "object-cover max-h-96 rounded"
+                , HP.class_ $ wrap "object-cover h-96 rounded"
                 ]
     ]
   where
