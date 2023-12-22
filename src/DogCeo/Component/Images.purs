@@ -75,7 +75,11 @@ render state =
                       Just subBreed -> subBreed <> " " <> state.breed.name
                       Nothing -> state.breed.name
                 ]
-            , HH.text $ (show 154) <> " images"
+            , HH.text $
+                case state.images of
+                  Loading -> ""
+                  Success images ->
+                    show (Array.length images) <> " images"
             ]
 
         , HH.div [ HP.class_ $ wrap "text-center" ] $
