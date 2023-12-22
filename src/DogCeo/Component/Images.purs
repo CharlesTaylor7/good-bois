@@ -58,45 +58,50 @@ initialState input = Record.merge input { page: 1 }
 render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
   HH.div
-    [ HP.class_ $ wrap "flex flex-col items-center " ]
-    [ HH.a
-        [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
-        , HE.onClick \_ -> Breadcrumb
-        ]
-        [ HH.text "Back to Breeds" ]
+    []
+    [ HH.div [ HP.class_ $ wrap "flex flex-row items-center justify-evenly " ]
+        [ HH.a
+            [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
+            , HE.onClick \_ -> Breadcrumb
+            ]
+            [ HH.text "Back to Breeds" ]
 
-    , HH.h2
-        [ HP.class_ $ wrap "text-xl font-semibold capitalize" ]
-        [ HH.text $
-            case state.breed.subBreed of
-              Just subBreed -> subBreed <> " " <> state.breed.name
-              Nothing -> state.breed.name
-        ]
-    , HH.text $
-        case state.images of
-          Loading -> ""
-          Success _ -> Array.fold
-            [ "page "
-            , show state.page
-            , " of "
-            , show $ maxPage state
+        , HH.h2
+            [ HP.class_ $ wrap "text-xl font-semibold capitalize" ]
+            [ HH.text $
+                case state.breed.subBreed of
+                  Just subBreed -> subBreed <> " " <> state.breed.name
+                  Nothing -> state.breed.name
             ]
 
-    , HH.div
-        []
-        [ HH.button
-            [ buttonStyle
-            , HP.disabled $ state.page <= minPage
-            , HE.onClick \_ -> GotoPreviousPage
+        , HH.div [] $
+            [ HH.text $
+                case state.images of
+                  Loading -> ""
+                  Success _ -> Array.fold
+                    [ "page "
+                    , show state.page
+                    , " of "
+                    , show $ maxPage state
+                    ]
             ]
-            [ HH.text "Previous" ]
 
-        , HH.button
-            [ buttonStyle
-            , HP.disabled $ state.page >= maxPage state
-            , HE.onClick \_ -> GotoNextPage
+        , HH.div
+            [ HP.class_ $ wrap "flex flex-row gap-2" ]
+            [ HH.button
+                [ buttonStyle
+                , HP.disabled $ state.page <= minPage
+                , HE.onClick \_ -> GotoPreviousPage
+                ]
+                [ HH.text "Previous" ]
+
+            , HH.button
+                [ buttonStyle
+                , HP.disabled $ state.page >= maxPage state
+                , HE.onClick \_ -> GotoNextPage
+                ]
+                [ HH.text "Next" ]
             ]
-            [ HH.text "Next" ]
         ]
     , case state.images of
         Loading ->
