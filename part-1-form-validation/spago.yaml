@@ -7,6 +7,7 @@ package:
   test:
     main: Test.Main
     dependencies:
+      - aff
+      - quickcheck
       - spec
       - spec-quickcheck
-      - quickcheck

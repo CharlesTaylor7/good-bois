@@ -118,7 +118,7 @@ render state =
             [ HP.class_ $ wrap "flex justify-center"
             ]
             [ HH.img
-                [ HP.src "./loading.gif"
+                [ HP.src "/loading.gif"
                 , HP.alt "Loading"
                 ]
             ]
