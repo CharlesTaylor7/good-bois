@@ -1,23 +1,17 @@
 {
-  "name": "pansoft",
-  "version": "0.0.0",
-  "repository": "git@github.com:CharlesTaylor7/pansoft.git",
+  "name": "panoramic-interview-part-2",
   "author": "Charles Taylor <charlestaylor95@gmail.com>",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "postinstall": "spago install",
-    "test": "spago test -p form-validation",
     "watch:js": "vite --port=3000 public",
     "watch:purs": "watchexec -e purs,yaml,js -- npm run build",
     "build": "spago build -p dog-breed-ui",
     "bundle": "npm run build && vite build public --outDir=../dist && cp -r public/static dist/"
   },
   "devDependencies": {
-    "benchmark": "^2.1.4",
-    "esbuild": "^0.19.2",
     "purescript": "0.15.10",
-    "purs-tidy": "^0.10.0",
     "spago": "^0.93.18",
     "tailwindcss": "^3.4.0",
     "vite": "^5.0.10"
