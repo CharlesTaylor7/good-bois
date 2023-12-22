@@ -1,26 +1,6 @@
-# NPM
 /node_modules/
-
-# Spago deps
 /.spago/
-
-# Spago docs folder
 /generated-docs/
-
-# Spago compilation
 /output/
-
-# ESbuild bundle
 /dist/
-
-# Yarn
-/yarn-error.log
-
-# Tailwind output
-/public/index.css
-
-# Purescript IDE
 .psc-ide-port
-
-# Benchotron directory for benchmarks
-/tmp
