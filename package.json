@@ -10,7 +10,8 @@
     "test": "spago test -p form-validation",
     "watch:js": "vite --port=3000 public",
     "watch:purs": "watchexec -e purs,yaml,js -- npm run build",
-    "build": "spago build -p dog-breed-ui"
+    "build": "spago build -p dog-breed-ui",
+    "bundle": "spago bundle -p dog-breed-ui --outfile public/index.js"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",

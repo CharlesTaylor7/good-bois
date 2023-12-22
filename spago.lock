@@ -4,17 +4,19 @@ workspace:
       path: ./
       dependencies:
         - aff
-        - console
+        - arrays
         - effect
         - fetch
         - fetch-argonaut
         - foldable-traversable
         - foreign-object
         - halogen
+        - integers
         - maybe
         - newtype
         - ordered-collections
         - prelude
+        - record
         - tuples
       test_dependencies: []
     form-validation:
@@ -24,6 +26,7 @@ workspace:
         - partial
         - prelude
       test_dependencies:
+        - aff
         - quickcheck
         - spec
         - spec-quickcheck
