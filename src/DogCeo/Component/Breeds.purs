@@ -20,29 +20,29 @@ data Output = Selected Breed
 
 type Slot = forall query. H.Slot query Output Unit
 
+type Input = State
+
 type State =
   { breeds :: ApiResult (Array BreedGroup)
   }
 
 data Action
-  = FetchBreeds
-  | Select Breed
+  = Select Breed
+  | Receive Input
 
-component :: forall query input monad. MonadAff monad => H.Component query input Output monad
+component :: forall query monad. MonadAff monad => H.Component query Input Output monad
 component =
   H.mkComponent
     { initialState
     , render
     , eval: H.mkEval $ H.defaultEval
         { handleAction = handleAction
-        , initialize = Just FetchBreeds
+        , receive = Just <<< Receive
         }
     }
 
-initialState :: forall input. input -> State
-initialState _ =
-  { breeds: Loading
-  }
+initialState :: Input -> State
+initialState input = input
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
@@ -86,9 +86,6 @@ render state =
 
 handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
 handleAction = case _ of
-  FetchBreeds -> do
-    breeds <- BreedsApi.fetch
-    H.modify_ \state -> state
-      { breeds = Success breeds }
+  Receive input -> H.put input
 
   Select breed -> H.raise $ Selected breed

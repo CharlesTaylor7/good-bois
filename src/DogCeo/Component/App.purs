@@ -9,10 +9,11 @@ import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (wrap)
+import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Api.Images as ImagesApi
-import DogCeo.Component.Breeds as ListView
+import DogCeo.Component.Breeds as BreedsPage
 import DogCeo.Component.Images as ImagesPage
-import DogCeo.Types (ApiResult(..), Breed, Page(..))
+import DogCeo.Types (ApiResult(..), Breed, BreedGroup, Page(..))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (liftEffect)
 import Effect.Console as Console
@@ -23,22 +24,22 @@ import Halogen.HTML.Properties as HP
 import Type.Proxy (Proxy(..))
 
 type Slots =
-  ( listView :: ListView.Slot
-  , detailsView :: ImagesPage.Slot
+  ( breedsPage :: BreedsPage.Slot
+  , imagesPage :: ImagesPage.Slot
   )
 
-_listView = Proxy :: Proxy "listView"
-_detailsView = Proxy :: Proxy "detailsView"
+_breedsPage = Proxy :: Proxy "breedsPage"
+_imagesPage = Proxy :: Proxy "imagesPage"
 
 type State =
-  { breeds :: ApiResult (Array Breed)
+  { breeds :: ApiResult (Array BreedGroup)
   , imagesCache :: Map Breed (Array String)
-  --, images :: ApiResult (Array String)
   , page :: Page
   }
 
 data Action
-  = HandleListView ListView.Output
+  = FetchBreeds
+  | HandleBreedsPage BreedsPage.Output
   | HandleImagesPage ImagesPage.Output
 
 component :: forall query input output monad. MonadAff monad => H.Component query input output monad
@@ -48,6 +49,7 @@ component =
     , render
     , eval: H.mkEval $ H.defaultEval
         { handleAction = handleAction
+        , initialize = Just FetchBreeds
         }
     }
 
@@ -62,10 +64,13 @@ render :: forall monad. MonadAff monad => State -> H.ComponentHTML Action Slots 
 render state =
   case state.page of
     BreedsPage ->
-      HH.slot _listView unit ListView.component unit HandleListView
+      HH.slot _breedsPage unit BreedsPage.component
+        { breeds: state.breeds
+        }
+        HandleBreedsPage
 
     ImagesPage { breed } ->
-      HH.slot _detailsView unit ImagesPage.component
+      HH.slot _imagesPage unit ImagesPage.component
         { breed
         , images:
             state.imagesCache
@@ -76,8 +81,13 @@ render state =
 
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
-  HandleListView (ListView.Selected breed) -> do
+  FetchBreeds -> do
+    breeds <- BreedsApi.fetch
+    H.modify_ \state -> state
+      { breeds = Success breeds
+      }
 
+  HandleBreedsPage (BreedsPage.Selected breed) -> do
     void $ H.fork $ do
       images <- ImagesApi.fetch breed
       H.modify_ \state -> state
