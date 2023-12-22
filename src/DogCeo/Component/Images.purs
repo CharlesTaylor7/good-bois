@@ -7,7 +7,6 @@ module DogCeo.Component.Images
 import Prelude
 
 import Data.Array as Array
-import Data.Int as Int
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import DogCeo.Types (ApiResult(..), Breed)
@@ -159,8 +158,8 @@ minPage = 1
 maxPage :: State -> Int
 maxPage { images } =
   let
-    q = n `Int.quot` imageLimit
-    r = n `Int.rem` imageLimit
+    q = n `div` imageLimit
+    r = n `mod` imageLimit
   in
     -- | division, but rounding up for a final extra page of less than 20 items
     q + if r > 0 then 1 else 0

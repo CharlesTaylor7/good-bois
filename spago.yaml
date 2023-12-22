@@ -9,7 +9,6 @@ package:
     - foldable-traversable
     - foreign-object
     - halogen
-    - integers
     - maybe
     - newtype
     - ordered-collections
