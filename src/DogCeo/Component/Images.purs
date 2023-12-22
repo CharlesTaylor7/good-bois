@@ -59,7 +59,7 @@ render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
   HH.div
     []
-    [ HH.div [ HP.class_ $ wrap "m-6 flex flex-row items-center justify-evenly " ]
+    [ HH.div [ HP.class_ $ wrap "m-6 flex flex-row flex-wrap items-center justify-evenly " ]
         [ HH.a
             [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
             , HE.onClick \_ -> NavBackToBreeds
