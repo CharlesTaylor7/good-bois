@@ -4,6 +4,3 @@ procs:
 
   Dev Server:
     shell: npm run watch:js
-
-  Test:
-    shell: watchexec -e purs,js,yaml --clear -- npm run test
