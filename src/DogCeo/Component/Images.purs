@@ -75,18 +75,8 @@ render state =
             ]
 
         , HH.div [ HP.class_ $ wrap "text-center" ] $
-            [ HH.text $
-                case state.images of
-                  Loading -> ""
-                  Success _ -> Array.fold
-                    [ "page "
-                    , show state.page
-                    , " of "
-                    , show $ maxPage state
-                    ]
-
-            , HH.div
-                [ HP.class_ $ wrap "flex flex-row gap-2" ]
+            [ HH.div
+                [ HP.class_ $ wrap "flex flex-row items-center gap-2" ]
                 [ HH.button
                     [ buttonStyle
                     , HP.disabled $ state.page <= minPage
@@ -100,6 +90,17 @@ render state =
                     , HE.onClick \_ -> GotoNextPage
                     ]
                     [ HH.text "Next" ]
+
+                , HH.text $
+                    case state.images of
+                      Loading -> ""
+                      Success _ -> Array.fold
+                        [ "page "
+                        , show state.page
+                        , " of "
+                        , show $ maxPage state
+                        ]
+
                 ]
             ]
         ]
