@@ -58,28 +58,20 @@ initialState input = Record.merge input { page: 1 }
 render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
   HH.div
-    []
-    [ HH.h2 [ HP.class_ $ wrap "text-xl font-semibold" ] [ HH.text "Dog Images" ]
-
-    , HH.a
+    [ HP.class_ $ wrap "flex flex-col items-center " ]
+    [ HH.a
         [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
         , HE.onClick \_ -> Breadcrumb
         ]
         [ HH.text "Back to Breeds" ]
-    , HH.button
-        [ buttonStyle
-        , HP.disabled $ state.page <= minPage
-        , HE.onClick \_ -> GotoPreviousPage
-        ]
-        [ HH.text "Previous" ]
 
-    , HH.button
-        [ buttonStyle
-        , HP.disabled $ state.page >= maxPage state
-        , HE.onClick \_ -> GotoNextPage
+    , HH.h2
+        [ HP.class_ $ wrap "text-xl font-semibold capitalize" ]
+        [ HH.text $
+            case state.breed.subBreed of
+              Just subBreed -> subBreed <> " " <> state.breed.name
+              Nothing -> state.breed.name
         ]
-        [ HH.text "Next" ]
-
     , HH.text $
         case state.images of
           Loading -> ""
@@ -90,6 +82,22 @@ render state =
             , show $ maxPage state
             ]
 
+    , HH.div
+        []
+        [ HH.button
+            [ buttonStyle
+            , HP.disabled $ state.page <= minPage
+            , HE.onClick \_ -> GotoPreviousPage
+            ]
+            [ HH.text "Previous" ]
+
+        , HH.button
+            [ buttonStyle
+            , HP.disabled $ state.page >= maxPage state
+            , HE.onClick \_ -> GotoNextPage
+            ]
+            [ HH.text "Next" ]
+        ]
     , case state.images of
         Loading ->
           HH.text "Loading..."
