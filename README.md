@@ -1,11 +1,18 @@
-# How To build & demo
+## Part 1: Data modeling & Design
 
-You will need npm and node installed on your system.
+Notes:
+See form-validation/FormValidation.purs for the code.
+There's also a test suite provided.
 
-JS deps are managed by npm, Purescript dependencies by Spago. (npm install will take of fetching the right version of this).
+
+The basic insight is to apply a technique called "Higher Kinded Data". The technique involves wrapping each field of the data type with an arbitrary functor. You can apply different functors to the data type to model different semantics. I first learned this technique from this blog: https://reasonablypolymorphic.com/blog/higher-kinded-data/
 
 
-To demo the UI
+## Part 2: Dog Breed UI
+
+This part is deployed to https://good-bois.netlify.app/
+
+If you prefer to build and run locally:
 ```
 # install dev tools, and purescript deps
 npm install 
@@ -13,33 +20,6 @@ npm install
 # compile the purescript
 npm run build 
 
-# watch the js output with vite
+# start the dev server with vite
 npm run watch:js 
 ```
-
-To run the test suite for part 1
-```
-npm test
-```
-
-## Part 1: Data modeling & Design
-
-Notes:
-
-
-## Part 2: Dog Breed UI 
-
-This project is 
-Notes:
-
-
-# TODO
-- [ ] Basic version, no fluff
-    - [ ] Dog Breed List
-        - [ ] fetch from api once
-        - [ ] list breeds and subbreads
-        - [ ] alphabetize
-        - [ ] Clickable breads
-    - [ ] Dog Breed Details 
-- [ ] Trim down dep list
-- [ ] Split project into 2 separate spago projects?
