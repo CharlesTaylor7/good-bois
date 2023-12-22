@@ -2,11 +2,8 @@ module DogCeo.Types
   ( Breed
   , BreedGroup
   , Page(..)
-  , ImageMap
   , ApiResult(..)
   ) where
-
-import Prelude
 
 import Data.Map (Map)
 import Data.Maybe (Maybe)
@@ -28,5 +25,3 @@ type Breed =
   { name :: String
   , subBreed :: Maybe String
   }
-
-type ImageMap = Map Breed (Array String)
