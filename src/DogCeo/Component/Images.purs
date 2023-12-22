@@ -59,7 +59,7 @@ render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
   HH.div
     []
-    [ HH.div [ HP.class_ $ wrap "flex flex-row items-center justify-evenly " ]
+    [ HH.div [ HP.class_ $ wrap "m-3 flex flex-row items-center justify-evenly " ]
         [ HH.a
             [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
             , HE.onClick \_ -> Breadcrumb
@@ -74,7 +74,7 @@ render state =
                   Nothing -> state.breed.name
             ]
 
-        , HH.div [] $
+        , HH.div [ HP.class_ $ wrap "text-center" ] $
             [ HH.text $
                 case state.images of
                   Loading -> ""
@@ -84,23 +84,23 @@ render state =
                     , " of "
                     , show $ maxPage state
                     ]
-            ]
 
-        , HH.div
-            [ HP.class_ $ wrap "flex flex-row gap-2" ]
-            [ HH.button
-                [ buttonStyle
-                , HP.disabled $ state.page <= minPage
-                , HE.onClick \_ -> GotoPreviousPage
-                ]
-                [ HH.text "Previous" ]
+            , HH.div
+                [ HP.class_ $ wrap "flex flex-row gap-2" ]
+                [ HH.button
+                    [ buttonStyle
+                    , HP.disabled $ state.page <= minPage
+                    , HE.onClick \_ -> GotoPreviousPage
+                    ]
+                    [ HH.text "Previous" ]
 
-            , HH.button
-                [ buttonStyle
-                , HP.disabled $ state.page >= maxPage state
-                , HE.onClick \_ -> GotoNextPage
+                , HH.button
+                    [ buttonStyle
+                    , HP.disabled $ state.page >= maxPage state
+                    , HE.onClick \_ -> GotoNextPage
+                    ]
+                    [ HH.text "Next" ]
                 ]
-                [ HH.text "Next" ]
             ]
         ]
     , case state.images of
