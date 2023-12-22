@@ -21,7 +21,6 @@ package:
       - WildCardInferredType
       - ShadowedName
 workspace:
-  lock: true
   build_opts:
     censor_library_warnings: all
   extra_packages:
