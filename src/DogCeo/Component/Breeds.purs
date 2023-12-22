@@ -8,7 +8,6 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
-import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Types (ApiResult(..), Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H

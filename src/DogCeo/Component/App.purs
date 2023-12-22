@@ -4,23 +4,17 @@ module DogCeo.Component.App
 
 import Prelude
 
-import Data.Either (Either(..))
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), maybe)
-import Data.Newtype (wrap)
 import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Api.Images as ImagesApi
 import DogCeo.Component.Breeds as BreedsPage
 import DogCeo.Component.Images as ImagesPage
 import DogCeo.Types (ApiResult(..), Breed, BreedGroup, Page(..))
 import Effect.Aff.Class (class MonadAff)
-import Effect.Class (liftEffect)
-import Effect.Console as Console
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
-import Halogen.HTML.Properties as HP
 import Type.Proxy (Proxy(..))
 
 type Slots =
@@ -87,8 +81,11 @@ handleAction = case _ of
       { breeds = Success breeds
       }
 
+  -- Navigates to the images page
+  -- Begins an api call if we haven't selected this breed before
   HandleBreedsPage (BreedsPage.Selected breed) -> do
-    void $ H.fork $ do
+    { imagesCache } <- H.get
+    when (Map.lookup breed imagesCache == Nothing) $ void $ H.fork $ do
       images <- ImagesApi.fetch breed
       H.modify_ \state -> state
         { imagesCache = state.imagesCache # Map.insert breed images
