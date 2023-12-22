@@ -111,9 +111,17 @@ render state =
                 ]
             ]
         ]
+
     , case state.images of
         Loading ->
-          HH.text "Loading..."
+          HH.div
+            [ HP.class_ $ wrap "flex justify-center"
+            ]
+            [ HH.img
+                [ HP.src "./loading.gif"
+                , HP.alt "Loading"
+                ]
+            ]
 
         Success images ->
           HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $

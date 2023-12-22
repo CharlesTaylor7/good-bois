@@ -51,7 +51,14 @@ render state =
     [ HH.h2 [ HP.class_ $ wrap "m-3 text-center text-2xl font-semibold" ] [ HH.text "Dog Breeds" ]
     , case state.breeds of
         Loading ->
-          HH.text "Loading..."
+          HH.div
+            [ HP.class_ $ wrap "flex justify-center"
+            ]
+            [ HH.img
+                [ HP.src "./loading.gif"
+                , HP.alt "Loading"
+                ]
+            ]
 
         Success breeds ->
           HH.ul [ HP.class_ $ wrap "ml-7 flex flex-col flex-wrap items-start pl-4 h-[80vh] list-disc" ] $

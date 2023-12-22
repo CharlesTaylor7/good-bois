@@ -81,8 +81,7 @@ handleAction = case _ of
     void $ H.fork $ do
       images <- ImagesApi.fetch breed
       H.modify_ \state -> state
-        { imagesCache =
-            state.imagesCache # Map.insert breed images
+        { imagesCache = state.imagesCache # Map.insert breed images
         }
 
     H.modify_ \state -> state
