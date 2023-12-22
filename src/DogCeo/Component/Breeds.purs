@@ -60,7 +60,7 @@ render state =
             ]
 
         Success breeds ->
-          HH.ul [ HP.class_ $ wrap "ml-7 flex flex-col flex-wrap items-start pl-4 h-[80vh] list-disc" ] $
+          HH.ul [ HP.class_ $ wrap "ml-7 sm:flex flex-col flex-wrap items-start pl-4 h-[80vh] list-disc" ] $
             breeds <#> \breed ->
               HH.li [ HP.class_ $ wrap "" ]
                 [ HH.a
