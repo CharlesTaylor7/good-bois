@@ -7,6 +7,7 @@ module DogCeo.Component.Images
 import Prelude
 
 import Data.Array as Array
+import Data.Int as Int
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import DogCeo.Types (ApiResult(..), Breed)
@@ -37,6 +38,8 @@ data Output = ToListView
 data Action
   = Breadcrumb
   | Receive Input
+  | GotoPreviousPage
+  | GotoNextPage
 
 component :: forall query monad. MonadAff monad => H.Component query Input Output monad
 component =
@@ -62,8 +65,31 @@ render state =
         [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
         , HE.onClick \_ -> Breadcrumb
         ]
-        [ HH.text "Back to Breeds"
+        [ HH.text "Back to Breeds" ]
+    , HH.button
+        [ buttonStyle
+        , HP.disabled $ state.page <= minPage
+        , HE.onClick \_ -> GotoPreviousPage
         ]
+        [ HH.text "Previous" ]
+
+    , HH.button
+        [ buttonStyle
+        , HP.disabled $ state.page >= maxPage state
+        , HE.onClick \_ -> GotoNextPage
+        ]
+        [ HH.text "Next" ]
+
+    , HH.text $
+        case state.images of
+          Loading -> ""
+          Success _ -> Array.fold
+            [ "page "
+            , show state.page
+            , " of "
+            , show $ maxPage state
+            ]
+
     , case state.images of
         Loading ->
           HH.text "Loading..."
@@ -78,17 +104,8 @@ render state =
                 , HP.class_ $ wrap "object-cover max-h-96 rounded"
                 ]
     ]
-
-currentPageImages ::
-  { page :: Int
-  , images :: Array String
-  } ->
-  Array String
-currentPageImages { page, images } =
-  Array.slice start end images
   where
-  start = (page - 1) * 20
-  end = page * 20
+  buttonStyle = HP.class_ $ wrap "border rounded-lg py-2 px-4 bg-sky-300 disabled:bg-slate-200"
 
 handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
 handleAction =
@@ -98,3 +115,45 @@ handleAction =
 
     Receive input ->
       H.modify_ $ Record.merge input
+
+    GotoPreviousPage ->
+      H.modify_ $ \state -> state { page = state.page - 1 }
+
+    GotoNextPage ->
+      H.modify_ $ \state -> state { page = state.page + 1 }
+
+{-
+  Pagination utilities
+-}
+
+minPage :: Int
+minPage = 1
+
+maxPage :: State -> Int
+maxPage { images } =
+  let
+    q = n `Int.quot` imageLimit
+    r = n `Int.rem` imageLimit
+  in
+    -- | division, but rounding up for a final extra page of less than 20 items
+    q + if r > 0 then 1 else 0
+
+  where
+  n = case images of
+    Loading -> 0
+    Success array -> Array.length array
+
+imageLimit :: Int
+imageLimit = 20
+
+currentPageImages ::
+  { page :: Int
+  , images :: Array String
+  } ->
+  Array String
+currentPageImages { page, images } =
+  Array.slice start end images
+  where
+  -- Note: the pages are indexed from 1
+  start = (page - 1) * 20
+  end = page * 20
