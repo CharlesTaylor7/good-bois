@@ -33,10 +33,10 @@ type State =
   | InputRow
   }
 
-data Output = ToListView
+data Output = BackToBreeds
 
 data Action
-  = Breadcrumb
+  = NavBackToBreeds
   | Receive Input
   | GotoPreviousPage
   | GotoNextPage
@@ -62,7 +62,7 @@ render state =
     [ HH.div [ HP.class_ $ wrap "m-6 flex flex-row items-center justify-evenly " ]
         [ HH.a
             [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
-            , HE.onClick \_ -> Breadcrumb
+            , HE.onClick \_ -> NavBackToBreeds
             ]
             [ HH.text "Back to Breeds" ]
 
@@ -137,8 +137,8 @@ render state =
 handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
 handleAction =
   case _ of
-    Breadcrumb ->
-      H.raise ToListView
+    NavBackToBreeds ->
+      H.raise BackToBreeds
 
     Receive input ->
       H.modify_ $ Record.merge input

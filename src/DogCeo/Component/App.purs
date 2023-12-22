@@ -81,8 +81,8 @@ handleAction = case _ of
       { breeds = Success breeds
       }
 
-  -- Navigates to the images page
-  -- Begins an api call if we haven't selected this breed before
+  -- Fetches the images if we haven't selected this breed before
+  -- Navigate to the images page for this breed
   HandleBreedsPage (BreedsPage.Selected breed) -> do
     { imagesCache } <- H.get
     when (Map.lookup breed imagesCache == Nothing) $ void $ H.fork $ do
@@ -94,5 +94,5 @@ handleAction = case _ of
     H.modify_ \state -> state
       { page = ImagesPage { breed } }
 
-  HandleImagesPage ImagesPage.ToListView ->
+  HandleImagesPage ImagesPage.BackToBreeds ->
     H.modify_ \state -> state { page = BreedsPage }
