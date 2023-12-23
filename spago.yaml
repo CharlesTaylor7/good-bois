@@ -15,10 +15,6 @@ package:
     - prelude
     - record
     - tuples
-  build:
-    censor_package_warnings:
-      - WildCardInferredType
-      - ShadowedName
 workspace:
   build_opts:
     censor_library_warnings: all
