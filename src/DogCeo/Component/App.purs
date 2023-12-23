@@ -35,6 +35,7 @@ type State =
 data Action
   = Init
   | RouteChanged Route
+  | HandleBreedsPage BreedsPage.Output
   | HandleImagesPage Breed ImagesPage.Output
 
 component ::
@@ -68,12 +69,13 @@ render ::
 render state =
   case state.route of
     BreedsRoute ->
-      HH.slot_
+      HH.slot
         (Proxy :: _ "breedsPage")
         unit
         BreedsPage.component
         { breeds: state.breeds
         }
+        HandleBreedsPage
 
     ImagesRoute { breed, page } ->
       HH.slot
@@ -103,14 +105,15 @@ handleAction = case _ of
 
     emitter <- HR.emitMatched
     void $ H.subscribe (RouteChanged <$> emitter)
-    void $ H.fork $ do
-      breeds <- BreedsApi.fetch
-      H.modify_ \state -> state
-        { breeds = Success breeds
-        }
 
   RouteChanged route -> do
     H.modify_ \state -> state { route = route }
+
+  HandleBreedsPage BreedsPage.FetchBreeds -> do
+    breeds <- BreedsApi.fetch
+    H.modify_ \state -> state
+      { breeds = Success breeds
+      }
 
   HandleImagesPage breed ImagesPage.FetchImages -> do
     images <- ImagesApi.fetch breed

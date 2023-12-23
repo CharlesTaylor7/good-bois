@@ -18,7 +18,7 @@ import Halogen.HTML.Properties as HP
 import Halogen.Router.Class (class MonadRouter)
 import Halogen.Router.Class as HR
 
-data Output = Void
+data Output = FetchBreeds
 
 type Slot = forall query. H.Slot query Output Unit
 
@@ -29,8 +29,9 @@ type State =
   }
 
 data Action
-  = Select Breed
+  = Init
   | Receive Input
+  | Select Breed
 
 component ::
   forall query monad.
@@ -97,7 +98,11 @@ handleAction ::
   Action ->
   H.HalogenM State Action slots Output monad Unit
 handleAction = case _ of
-  Receive input -> H.put input
+  Init ->
+    H.raise FetchBreeds
+
+  Receive input ->
+    H.put input
 
   Select breed -> do
     HR.navigate $ ImagesRoute { breed, page: 1 }
