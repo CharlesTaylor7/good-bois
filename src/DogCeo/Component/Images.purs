@@ -34,7 +34,6 @@ type InputRow =
   )
 
 type Slot id = forall query. H.Slot query Output id
-type Slots = ()
 
 type State =
   { failedImageSources :: Set String
@@ -68,7 +67,7 @@ component =
 initialState :: Input -> State
 initialState = Record.merge { failedImageSources: Set.empty }
 
-render :: forall monad. State -> H.ComponentHTML Action Slots monad
+render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
   HH.div
     []
@@ -183,7 +182,7 @@ handleAction ::
   MonadRouter Route monad =>
   MonadAff monad =>
   Action ->
-  H.HalogenM State Action Slots Output monad Unit
+  H.HalogenM State Action () Output monad Unit
 handleAction =
   case _ of
     Init ->
