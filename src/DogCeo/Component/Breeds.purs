@@ -6,11 +6,11 @@ module DogCeo.Component.Breeds
 
 import Prelude
 
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Debug (spy)
 import DogCeo.Api.Utils as Api
-import DogCeo.Routes (Page(..), Route(..))
+import DogCeo.Routes (Route(..))
 import DogCeo.Types (Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -119,8 +119,4 @@ handleAction = case _ of
     H.put input
 
   Select breed -> do
-    route <- HR.current
-    HR.navigate
-      { slow: route # maybe false _.slow
-      , page: ImagesPage { breed, page: 1 }
-      }
+    HR.navigate $ ImagesRoute { breed, page: 1 }
