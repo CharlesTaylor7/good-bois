@@ -6,7 +6,7 @@ import Prelude
 
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Api.Images as ImagesApi
 import DogCeo.Api.Utils as Api
@@ -91,15 +91,15 @@ handleAction = case _ of
       Api.Success _ ->
         pure unit
 
-      -- if its considered loading or previously errored
-      -- then make a request
+      -- if the page is in a loading state or previously errored
+      -- then fetch the images
       _ -> void $ H.fork $ do
         images <- ImagesApi.fetch breed
-        H.modify_ \state -> state
-          { imagesCache = state.imagesCache # Map.insert breed images
-          }
 
-        H.modify_ \state -> state
+        H.modify_ \s -> s
+          { imagesCache = state.imagesCache # Map.insert breed images }
+
+        H.modify_ \s -> s
           { page = ImagesPage { breed } }
 
   HandleImagesPage ImagesPage.BackToBreeds ->

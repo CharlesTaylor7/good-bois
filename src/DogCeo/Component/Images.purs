@@ -13,7 +13,6 @@ import Data.Set (Set)
 import Data.Set as Set
 import DogCeo.Api.Utils as Api
 import DogCeo.Types (Breed)
-import DogCeo.Types (Breed)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
@@ -33,6 +32,8 @@ type Slot id = forall query. H.Slot query Output id
 
 type State =
   { page :: Int
+  , failedImages :: Set String
+  , loadedImages :: Set String
   | InputRow
   }
 
@@ -43,6 +44,8 @@ data Action
   | Receive Input
   | GotoPreviousPage
   | GotoNextPage
+  | ImageLoaded String
+  | ImageNotFound String
 
 component :: forall query monad. MonadAff monad => H.Component query Input Output monad
 component =
@@ -56,7 +59,11 @@ component =
     }
 
 initialState :: Input -> State
-initialState input = Record.merge input { page: 1 }
+initialState = Record.merge
+  { page: minPage
+  , failedImages: Set.empty
+  , loadedImages: Set.empty
+  }
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
@@ -133,12 +140,57 @@ render state =
             [ HH.text "An error occurred, contact support" ]
 
         Api.Success images ->
-          HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
-            currentPageImages { page: state.page, images } <#> \src ->
-              HH.img
-                [ HP.src src
-                , HP.class_ $ wrap "object-cover h-96 w-96 rounded"
-                ]
+          HH.div [] $
+            [ HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
+                pageImages { page: state.page, images } <#> \src ->
+                  HH.div []
+                    [ HH.img
+                        [ HP.src src
+                        , HE.onLoad \_ -> ImageLoaded src
+                        , HE.onError \_ -> ImageNotFound src
+                        , HP.class_ $ wrap $ Array.intercalate " "
+                            [ "object-cover h-96 w-96 rounded"
+                            , if
+                                not (src `Set.member` state.loadedImages) ||
+                                  (src `Set.member` state.failedImages) then "hidden"
+                              else ""
+                            ]
+                        ]
+
+                    , HH.img
+                        [ HP.src "/static/loading.gif"
+                        , HP.alt "Loading"
+                        , HP.class_ $ wrap $ Array.intercalate " "
+                            [ "object-cover h-96 w-96 rounded"
+                            , if src `Set.member` state.loadedImages then "hidden" else ""
+                            ]
+                        ]
+                    ]
+            , let
+                failedImgCount =
+                  pageImages { page: state.page, images }
+                    # Array.filter (\src -> src `Set.member` state.failedImages)
+                    # Array.length
+              in
+                HH.div
+                  [ HP.class_ $ wrap $ Array.intercalate " "
+                      [ "text-center"
+                      , if failedImgCount == 0 then "hidden" else ""
+                      ]
+                  ]
+                  [ HH.text $ show failedImgCount <> " images failed to load." ]
+
+            --| Prefetches the next page of images
+            --| Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src attributes. 
+            --| This means after clicking 'Next', you can see stale images from the previous page while the new image is loading.
+            --| Prefetching images allows images to swap out seemlessly after clicking the Next button.
+            , HH.div [] $
+                pageImages { page: state.page + 1, images } <#> \src ->
+                  HH.link
+                    [ HP.rel "prefetch"
+                    , HP.href src
+                    ]
+            ]
     ]
   where
   buttonStyle = HP.class_ $ wrap "border rounded-lg py-2 px-4 bg-sky-300 disabled:bg-slate-200"
@@ -158,6 +210,12 @@ handleAction =
     GotoNextPage ->
       H.modify_ $ \state -> state { page = state.page + 1 }
 
+    ImageNotFound src -> do
+      H.modify_ \state -> state { failedImages = state.failedImages # Set.insert src }
+
+    ImageLoaded src -> do
+      H.modify_ \state -> state { loadedImages = state.loadedImages # Set.insert src }
+
 {-
   Pagination utilities
 -}
@@ -167,30 +225,28 @@ minPage = 1
 
 maxPage :: State -> Int
 maxPage { images } =
-  let
-    q = n `div` imageLimit
-    r = n `mod` imageLimit
-  in
-    -- | division, but rounding up for a final extra page of less than 20 items
-    q + if r > 0 then 1 else 0
-
-  where
-  n = case images of
+  case images of
     Api.Loading -> 0
     Api.Error _ -> 0
-    Api.Success array -> Array.length array
+    Api.Success array ->
+      let
+        n = Array.length array
+        q = n `div` imagesPerPage
+        r = n `mod` imagesPerPage
+      in
+        -- | division, but rounding up for a final extra page of less than 20 items
+        q + if r > 0 then 1 else 0
 
-imageLimit :: Int
-imageLimit = 20
+imagesPerPage :: Int
+imagesPerPage = 20
 
-currentPageImages ::
+pageImages ::
   { page :: Int
   , images :: Array String
   } ->
   Array String
-currentPageImages { page, images } =
+pageImages { page, images } =
   Array.slice start end images
   where
-  -- Note: the pages are indexed from 1
-  start = (page - 1) * 20
-  end = page * 20
+  start = (page - 1) * imagesPerPage
+  end = start + imagesPerPage
