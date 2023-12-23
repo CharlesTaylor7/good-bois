@@ -12,8 +12,9 @@ import Data.Newtype (wrap)
 import Data.Set (Set)
 import Data.Set as Set
 import Debug (spy)
+import DogCeo.Api.Utils as Api
 import DogCeo.Routes (Route(..))
-import DogCeo.Types (ApiResult(..), Breed)
+import DogCeo.Types (Breed)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
@@ -30,7 +31,7 @@ data Output = FetchImages
 type InputRow =
   ( breed :: Breed
   , page :: Int
-  , images :: ApiResult (Array String)
+  , images :: Api.Result (Array String)
   )
 
 type Slot id = forall query. H.Slot query Output id
@@ -89,9 +90,9 @@ render state =
                 ]
             , HH.text $
                 case state.images of
-                  Loading -> ""
-                  Error _ -> ""
-                  Success images ->
+                  Api.Loading -> ""
+                  Api.Error _ -> ""
+                  Api.Success images ->
                     show (Array.length images) <> " images"
             ]
 
@@ -114,9 +115,9 @@ render state =
 
                 , HH.text $
                     case state.images of
-                      Loading -> ""
-                      Error _ -> ""
-                      Success _ -> Array.fold
+                      Api.Loading -> ""
+                      Api.Error _ -> ""
+                      Api.Success _ -> Array.fold
                         [ "page "
                         , show state.page
                         , " of "
@@ -127,7 +128,7 @@ render state =
         ]
 
     , case state.images of
-        Loading ->
+        Api.Loading ->
           HH.div
             [ HP.class_ $ wrap "flex justify-center"
             ]
@@ -136,12 +137,12 @@ render state =
                 , HP.alt "Loading"
                 ]
             ]
-        Error _ ->
+        Api.Error _ ->
           HH.div
             [ HP.class_ $ wrap "text-align" ]
             [ HH.text "An error occurred, contact support" ]
 
-        Success images ->
+        Api.Success images ->
           HH.div [] $
             [ HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
                 pageImages { page: state.page, images } <#> \src ->
@@ -229,9 +230,9 @@ maxPage { images } =
 
   where
   n = case images of
-    Loading -> 0
-    Error _ -> 0
-    Success array -> Array.length array
+    Api.Loading -> 0
+    Api.Error _ -> 0
+    Api.Success array -> Array.length array
 
 imageLimit :: Int
 imageLimit = 20

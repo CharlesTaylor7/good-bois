@@ -10,10 +10,11 @@ import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Debug (spy)
 import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Api.Images as ImagesApi
+import DogCeo.Api.Utils as Api
 import DogCeo.Component.Breeds as BreedsPage
 import DogCeo.Component.Images as ImagesPage
 import DogCeo.Routes (Route(..))
-import DogCeo.Types (ApiResult(..), Breed, BreedGroup)
+import DogCeo.Types (Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
@@ -27,8 +28,8 @@ type Slots =
   )
 
 type State =
-  { breeds :: ApiResult (Array BreedGroup)
-  , imagesCache :: Map Breed (Array String)
+  { breeds :: Api.Result (Array BreedGroup)
+  , imagesCache :: Map Breed (Api.Result (Array String))
   , route :: Maybe Route
   }
 
@@ -55,7 +56,7 @@ component =
 
 initialState :: forall input. input -> State
 initialState _ =
-  { breeds: Loading
+  { breeds: Api.Loading
   , imagesCache: Map.empty
   , route: Nothing
   }
@@ -90,7 +91,7 @@ render state =
         , images:
             state.imagesCache
               # Map.lookup breed
-              # maybe Loading Success
+              # fromMaybe Api.Loading
         }
         (HandleImagesPage breed)
 
@@ -114,9 +115,7 @@ handleAction = case _ of
 
   HandleBreedsPage BreedsPage.FetchBreeds -> do
     breeds <- BreedsApi.fetch
-    H.modify_ \state -> state
-      { breeds = Success breeds
-      }
+    H.modify_ \state -> state { breeds = breeds }
 
   HandleImagesPage breed ImagesPage.FetchImages -> do
     images <- ImagesApi.fetch breed

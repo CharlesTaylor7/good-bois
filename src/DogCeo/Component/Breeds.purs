@@ -9,8 +9,9 @@ import Prelude
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Debug (spy)
+import DogCeo.Api.Utils as Api
 import DogCeo.Routes (Route(..))
-import DogCeo.Types (ApiResult(..), Breed, BreedGroup)
+import DogCeo.Types (Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
@@ -26,7 +27,7 @@ type Slot id = forall query. H.Slot query Output id
 type Input = State
 
 type State =
-  { breeds :: ApiResult (Array BreedGroup)
+  { breeds :: Api.Result (Array BreedGroup)
   }
 
 data Action
@@ -59,7 +60,7 @@ render state =
     []
     [ HH.h2 [ HP.class_ $ wrap "m-3 text-center text-2xl font-semibold" ] [ HH.text "Dog Breeds" ]
     , case state.breeds of
-        Loading ->
+        Api.Loading ->
           HH.div
             [ HP.class_ $ wrap "flex justify-center"
             ]
@@ -69,12 +70,12 @@ render state =
                 ]
             ]
 
-        Error _ ->
+        Api.Error _ ->
           HH.div
-            [ HP.class_ $ wrap "text-align" ]
+            [ HP.class_ $ wrap "text-center" ]
             [ HH.text "An error occurred, contact support" ]
 
-        Success breeds ->
+        Api.Success breeds ->
           HH.ul [ HP.class_ $ wrap "ml-7 sm:flex flex-col flex-wrap items-start pl-4 h-[80vh] list-disc" ] $
             breeds <#> \breed ->
               HH.li [ HP.class_ $ wrap "" ]

@@ -6,6 +6,7 @@ package:
     - debug
     - exceptions
     - effect
+    - either
     - fetch
     - fetch-argonaut
     - foldable-traversable
