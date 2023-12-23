@@ -2,5 +2,6 @@
 /.spago/
 /generated-docs/
 /output/
-/dist/
+/dist/*
+!/dist/_redirects
 .psc-ide-port
