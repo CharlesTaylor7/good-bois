@@ -37,7 +37,8 @@ type InputRow =
 type Slot id = forall query. H.Slot query Output id
 
 type State =
-  { failedImageSources :: Set String
+  { failedImages :: Set String
+  , loadedImages :: Set String
   | InputRow
   }
 
@@ -47,6 +48,7 @@ data Action
   | NavBackToBreeds
   | GotoPreviousPage
   | GotoNextPage
+  | ImageLoaded String
   | ImageNotFound String
 
 component ::
@@ -66,7 +68,10 @@ component =
     }
 
 initialState :: Input -> State
-initialState = Record.merge { failedImageSources: Set.empty }
+initialState = Record.merge
+  { failedImages: Set.empty
+  , loadedImages: Set.empty
+  }
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
@@ -146,18 +151,33 @@ render state =
           HH.div [] $
             [ HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
                 pageImages { page: state.page, images } <#> \src ->
-                  HH.img
-                    [ HP.src src
-                    , HE.onError \_ -> ImageNotFound src
-                    , HP.class_ $ wrap $ Array.intercalate " "
-                        [ "object-cover h-96 w-96 rounded"
-                        , if src `Set.member` state.failedImageSources then "hidden" else ""
+                  HH.div []
+                    [ HH.img
+                        [ HP.src src
+                        , HE.onLoad \_ -> ImageLoaded src
+                        , HE.onError \_ -> ImageNotFound src
+                        , HP.class_ $ wrap $ Array.intercalate " "
+                            [ "object-cover h-96 w-96 rounded"
+                            , if
+                                not (src `Set.member` state.loadedImages) ||
+                                  (src `Set.member` state.failedImages) then "hidden"
+                              else ""
+                            ]
+                        ]
+
+                    , HH.img
+                        [ HP.src "/static/loading.gif"
+                        , HP.alt "Loading"
+                        , HP.class_ $ wrap $ Array.intercalate " "
+                            [ "object-cover h-96 w-96 rounded"
+                            , if src `Set.member` state.loadedImages then "hidden" else ""
+                            ]
                         ]
                     ]
             , let
                 failedImgCount =
                   pageImages { page: state.page, images }
-                    # Array.filter (\src -> src `Set.member` state.failedImageSources)
+                    # Array.filter (\src -> src `Set.member` state.failedImages)
                     # Array.length
               in
                 HH.div
@@ -216,7 +236,10 @@ handleAction =
       HR.navigate $ ImagesRoute { breed, page: page + 1 }
 
     ImageNotFound src -> do
-      H.modify_ \state -> state { failedImageSources = state.failedImageSources # Set.insert src }
+      H.modify_ \state -> state { failedImages = state.failedImages # Set.insert src }
+
+    ImageLoaded src -> do
+      H.modify_ \state -> state { loadedImages = state.loadedImages # Set.insert src }
 
 {-
   Pagination utilities
