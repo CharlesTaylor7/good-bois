@@ -7,11 +7,9 @@ module DogCeo.Component.Images
 import Prelude
 
 import Data.Array as Array
-import Data.Enum (enumFromTo)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Debug (spy)
-import DogCeo.Component.Image as Image
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (ApiResult(..), Breed)
 import Effect.Aff.Class (class MonadAff)
@@ -35,7 +33,7 @@ type InputRow =
   )
 
 type Slot = forall query. H.Slot query Output Unit
-type Slots = (image :: Image.Slot)
+type Slots = ()
 
 type State = { | InputRow }
 
@@ -134,8 +132,24 @@ render state =
             ]
 
         Success images ->
-          HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
-            renderPageImages state images
+          HH.div [] $
+            [ HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
+                pageImages { page: state.page, images } <#> \src ->
+                  HH.img
+                    [ HP.src src
+                    --, HE.onError \_ -> ImageNotFound
+                    , HP.class_ $ wrap $ Array.intercalate " "
+                        [ "object-cover h-96 rounded"
+                        --, if imageNotFound then "hidden" else ""
+                        ]
+                    ]
+            , HH.div [] $
+                pageImages { page: state.page + 1, images } <#> \src ->
+                  HH.link
+                    [ HP.rel "prefetch"
+                    , HP.href src
+                    ]
+            ]
     ]
 
   where
@@ -190,23 +204,8 @@ maxPage { images } =
 imageLimit :: Int
 imageLimit = 20
 
--- | Each image is rendered alongside a <link> tag which prefetches the image which is exactly 20 indices ahead of it.
--- | Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src. This means after clicking 'Next', you can see stale images from the previous page while the new image is loading.
--- | Prefetching images allows images to swap out seemlessly after clicking the Next button.
-renderPageImages ::
-  forall action monad.
-  State ->
-  Array String ->
-  Array (HH.ComponentHTML action Slots monad)
-renderPageImages { page } images =
-  enumFromTo 1 imageLimit
-    # Array.mapMaybe
-        \i ->
-          let
-            currentIndex = (page - 1) * imageLimit + (i - 1)
-            nextIndex = currentIndex + imageLimit
-            next = Array.index images nextIndex
-
-          in
-            Array.index images currentIndex <#> \current ->
-              HH.slot_ (Proxy :: _ "image") i Image.component { current, next }
+pageImages :: { page :: Int, images :: Array String } -> Array String
+pageImages { page, images } = Array.slice start end images
+  where
+  start = (page - 1) * imageLimit
+  end = start + imageLimit

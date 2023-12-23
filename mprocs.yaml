@@ -1,6 +1,6 @@
 procs:
   Build:
-    shell: watchexec -e purs,js,yaml --clear -- npm run build
+    shell: watchexec -e purs,js,yaml --clear -- npx spago build --pedantic-packages
 
   Dev Server:
     shell: npm run watch:js

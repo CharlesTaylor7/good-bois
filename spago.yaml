@@ -5,7 +5,6 @@ package:
     - arrays
     - debug
     - effect
-    - enums
     - fetch
     - fetch-argonaut
     - foldable-traversable
