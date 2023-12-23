@@ -5,7 +5,6 @@ module DogCeo.Types
   , ApiResult(..)
   ) where
 
-import Data.Map (Map)
 import Data.Maybe (Maybe)
 
 data ApiResult a

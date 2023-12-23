@@ -15,6 +15,8 @@ package:
     - ordered-collections
     - prelude
     - record
+    - routing
+    - routing-duplex
     - tuples
   build:
     censor_package_warnings:

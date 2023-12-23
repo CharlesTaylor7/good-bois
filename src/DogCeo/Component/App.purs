@@ -32,7 +32,7 @@ type State =
   }
 
 data Action
-  = FetchBreeds
+  = Init
   | HandleBreedsPage BreedsPage.Output
   | HandleImagesPage ImagesPage.Output
 
@@ -43,7 +43,7 @@ component =
     , render
     , eval: H.mkEval $ H.defaultEval
         { handleAction = handleAction
-        , initialize = Just FetchBreeds
+        , initialize = Just Init
         }
     }
 
@@ -75,11 +75,12 @@ render state =
 
 handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
-  FetchBreeds -> do
-    breeds <- BreedsApi.fetch
-    H.modify_ \state -> state
-      { breeds = Success breeds
-      }
+  Init -> do
+    void $ H.fork $ do
+      breeds <- BreedsApi.fetch
+      H.modify_ \state -> state
+        { breeds = Success breeds
+        }
 
   -- Fetches the images if we haven't selected this breed before
   -- Navigate to the images page for this breed
