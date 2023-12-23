@@ -33,7 +33,7 @@ type InputRow =
   , images :: ApiResult (Array String)
   )
 
-type Slot = forall query. H.Slot query Output Unit
+type Slot id = forall query. H.Slot query Output id
 type Slots = ()
 
 type State =

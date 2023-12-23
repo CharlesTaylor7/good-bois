@@ -21,7 +21,7 @@ import Halogen.Router.Class as HR
 
 data Output = FetchBreeds
 
-type Slot = forall query. H.Slot query Output Unit
+type Slot id = forall query. H.Slot query Output id
 
 type Input = State
 
