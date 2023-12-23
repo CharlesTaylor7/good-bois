@@ -106,8 +106,14 @@ handleAction ::
   Action ->
   H.HalogenM State Action slots Output monad Unit
 handleAction = case _ of
-  Init ->
-    H.raise FetchBreeds
+  Init -> do
+    { breeds } <- H.get
+    case breeds of
+      Api.Success _ ->
+        pure unit
+
+      _ ->
+        H.raise FetchBreeds
 
   Receive input ->
     H.put input

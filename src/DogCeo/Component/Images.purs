@@ -192,8 +192,14 @@ handleAction ::
   H.HalogenM State Action () Output monad Unit
 handleAction =
   case _ of
-    Init ->
-      H.raise FetchImages
+    Init -> do
+      { images } <- H.get
+      case images of
+        Api.Success _ ->
+          pure unit
+
+        _ ->
+          H.raise FetchImages
 
     Receive input ->
       H.modify_ $ Record.merge input
