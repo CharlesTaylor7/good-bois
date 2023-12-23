@@ -3,7 +3,9 @@ package:
   dependencies:
     - aff
     - arrays
+    - exceptions
     - effect
+    - either
     - fetch
     - fetch-argonaut
     - foldable-traversable
