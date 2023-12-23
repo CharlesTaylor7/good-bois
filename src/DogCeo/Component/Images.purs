@@ -11,13 +11,11 @@ import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.Set (Set)
 import Data.Set as Set
-import Data.Time.Duration (Milliseconds(..))
 import Debug (spy)
 import DogCeo.Api.Utils as Api
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (Breed)
-import Effect.Aff as Aff
-import Effect.Aff.Class (class MonadAff, liftAff)
+import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -41,7 +39,6 @@ type Slot id = forall query. H.Slot query Output id
 type State =
   { failedImages :: Set String
   , loadedImages :: Set String
-  , slowMode :: Boolean
   | InputRow
   }
 
@@ -51,7 +48,6 @@ data Action
   | NavBackToBreeds
   | GotoPreviousPage
   | GotoNextPage
-  | ToggleSlowMode
   | ImageLoaded String
   | ImageNotFound String
 
@@ -75,7 +71,6 @@ initialState :: Input -> State
 initialState = Record.merge
   { failedImages: Set.empty
   , loadedImages: Set.empty
-  , slowMode: false
   }
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
@@ -88,18 +83,6 @@ render state =
             , HE.onClick \_ -> NavBackToBreeds
             ]
             [ HH.text "Back to Breeds" ]
-
-        , HH.div
-            [ HP.class_ $ wrap "flex gap-2" ]
-            [ HH.label [] [ HH.text "Simulate Slow Connection" ]
-            , HH.input
-                [ HP.type_ HP.InputCheckbox
-                --HP.checkbox
-                --"checkbox"
-                , HP.checked state.slowMode
-                , HE.onClick \_ -> ToggleSlowMode
-                ]
-            ]
 
         , HH.div
             [ HP.class_ $ wrap "flex flex-col items-center" ]
@@ -253,15 +236,10 @@ handleAction =
       HR.navigate $ ImagesRoute { breed, page: page + 1 }
 
     ImageNotFound src -> do
-      { slowMode } <- H.get
-      when slowMode $ liftAff $ Aff.delay $ Milliseconds 1000.0
       H.modify_ \state -> state { failedImages = state.failedImages # Set.insert src }
 
     ImageLoaded src -> do
       H.modify_ \state -> state { loadedImages = state.loadedImages # Set.insert src }
-
-    ToggleSlowMode -> do
-      H.modify_ \state -> state { slowMode = not state.slowMode }
 
 {-
   Pagination utilities
