@@ -139,7 +139,7 @@ render state =
             ]
         Api.Error _ ->
           HH.div
-            [ HP.class_ $ wrap "text-align" ]
+            [ HP.class_ $ wrap "text-center" ]
             [ HH.text "An error occurred, contact support" ]
 
         Api.Success images ->
