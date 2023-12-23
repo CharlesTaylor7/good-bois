@@ -6,8 +6,10 @@ module DogCeo.Routes
 import Prelude
 
 import Data.Generic.Rep (class Generic)
+import Data.Symbol (class IsSymbol)
 import DogCeo.Types (Breed)
-import Routing.Duplex (RouteDuplex')
+import Prim.Row as Row
+import Routing.Duplex (RouteDuplex, RouteDuplex')
 import Routing.Duplex as R
 import Routing.Duplex.Generic as G
 import Type.Proxy (Proxy(..))
@@ -23,11 +25,21 @@ codec :: RouteDuplex' Route
 codec = R.root $ G.sum
   { "BreedsRoute": G.noArgs
   , "ImagesRoute": R.path "images" $ R.record
-      # R.prop (Proxy :: _ "breed")
+      # prop @"page" (R.int $ R.param "page")
+      # prop @"breed"
           ( R.record
-              # R.prop (Proxy :: _ "name") (R.string R.segment)
-              # R.prop (Proxy :: _ "subBreed") (R.optional R.segment)
+              # prop @"name" (R.string R.segment)
+              # prop @"subBreed" (R.optional R.segment)
           )
-      # R.prop (Proxy :: _ "page") (R.int $ R.param "page")
   }
 
+prop ::
+  forall @sym a b r1 r2 r3 rx.
+  IsSymbol sym =>
+  Row.Cons sym a rx r1 =>
+  Row.Cons sym b r2 r3 =>
+  Row.Lacks sym r2 =>
+  RouteDuplex a b ->
+  RouteDuplex (Record r1) (Record r2) ->
+  RouteDuplex (Record r1) (Record r3)
+prop = R.prop (Proxy :: _ sym)
