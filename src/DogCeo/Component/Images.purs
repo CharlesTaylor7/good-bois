@@ -24,6 +24,7 @@ import Record as Record
 import Type.Proxy (Proxy(..))
 
 type Input = { | InputRow }
+data Output = FetchImages
 
 -- | The input is merged into the state, so we describe its properties in one place as a row type
 type InputRow =
@@ -37,11 +38,10 @@ type Slots = (image :: Image.Slot)
 
 type State = { | InputRow }
 
-data Output = BackToBreeds
-
 data Action
-  = NavBackToBreeds
+  = Init
   | Receive Input
+  | NavBackToBreeds
   | GotoPreviousPage
   | GotoNextPage
 
@@ -56,6 +56,7 @@ component =
     , render
     , eval: H.mkEval $ H.defaultEval
         { handleAction = handleAction
+        , initialize = Just Init
         , receive = Just <<< Receive
         }
     }
@@ -147,11 +148,14 @@ handleAction ::
   H.HalogenM State Action Slots Output monad Unit
 handleAction =
   case _ of
-    NavBackToBreeds ->
-      H.raise BackToBreeds
+    Init ->
+      H.raise FetchImages
 
     Receive input ->
       H.modify_ $ Record.merge input
+
+    NavBackToBreeds ->
+      HR.navigate BreedsRoute
 
     GotoPreviousPage -> do
       { breed, page } <- H.get

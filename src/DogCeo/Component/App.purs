@@ -4,6 +4,7 @@ module DogCeo.Component.App
 
 import Prelude
 
+import Data.Foldable (for_)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), maybe)
@@ -25,20 +26,16 @@ type Slots =
   , imagesPage :: ImagesPage.Slot
   )
 
-_breedsPage = Proxy :: Proxy "breedsPage"
-_imagesPage = Proxy :: Proxy "imagesPage"
-
 type State =
   { breeds :: ApiResult (Array BreedGroup)
   , imagesCache :: Map Breed (Array String)
-  , route :: Maybe Route
+  , route :: Route
   }
 
 data Action
   = Init
-  | ChangeRoute Route
-  | HandleBreedsPage BreedsPage.Output
-  | HandleImagesPage ImagesPage.Output
+  | RouteChanged Route
+  | HandleImagesPage Breed ImagesPage.Output
 
 component ::
   forall query input output monad.
@@ -59,7 +56,7 @@ initialState :: forall input. input -> State
 initialState _ =
   { breeds: Loading
   , imagesCache: Map.empty
-  , route: Just BreedsRoute
+  , route: BreedsRoute
   }
 
 render ::
@@ -70,17 +67,19 @@ render ::
   H.ComponentHTML Action Slots monad
 render state =
   case state.route of
-    Nothing ->
-      HH.text ""
-
-    Just BreedsRoute ->
-      HH.slot _breedsPage unit BreedsPage.component
+    BreedsRoute ->
+      HH.slot_
+        (Proxy :: _ "breedsPage")
+        unit
+        BreedsPage.component
         { breeds: state.breeds
         }
-        HandleBreedsPage
 
-    Just (ImagesRoute { breed, page }) ->
-      HH.slot _imagesPage unit ImagesPage.component
+    ImagesRoute { breed, page } ->
+      HH.slot
+        (Proxy :: _ "imagesPage")
+        unit
+        ImagesPage.component
         { breed
         , page
         , images:
@@ -88,7 +87,7 @@ render state =
               # Map.lookup breed
               # maybe Loading Success
         }
-        HandleImagesPage
+        (HandleImagesPage breed)
 
 handleAction ::
   forall output monad.
@@ -98,31 +97,23 @@ handleAction ::
   H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
   Init -> do
-    route <- HR.current
-    H.modify_ \state -> state { route = route }
+    currentRoute <- HR.current
+    for_ currentRoute $ \route ->
+      H.modify_ \state -> state { route = route }
 
     emitter <- HR.emitMatched
-    void $ H.subscribe (ChangeRoute <$> emitter)
+    void $ H.subscribe (RouteChanged <$> emitter)
     void $ H.fork $ do
       breeds <- BreedsApi.fetch
       H.modify_ \state -> state
         { breeds = Success breeds
         }
 
-  ChangeRoute route -> do
-    H.modify_ \state -> state { route = Just route }
+  RouteChanged route -> do
+    H.modify_ \state -> state { route = route }
 
-  -- Fetches the images if we haven't selected this breed before
-  -- Navigate to the images page for this breed
-  HandleBreedsPage (BreedsPage.Selected breed) -> do
-    HR.navigate $ ImagesRoute { breed, page: 1 }
-
-    { imagesCache } <- H.get
-    when (Map.lookup breed imagesCache == Nothing) $ void $ H.fork $ do
-      images <- ImagesApi.fetch breed
-      H.modify_ \state -> state
-        { imagesCache = state.imagesCache # Map.insert breed images
-        }
-
-  HandleImagesPage ImagesPage.BackToBreeds ->
-    HR.navigate BreedsRoute
+  HandleImagesPage breed ImagesPage.FetchImages -> do
+    images <- ImagesApi.fetch breed
+    H.modify_ \state -> state
+      { imagesCache = state.imagesCache # Map.insert breed images
+      }

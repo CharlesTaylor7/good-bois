@@ -8,14 +8,17 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
+import DogCeo.Routes (Route(..))
 import DogCeo.Types (ApiResult(..), Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Halogen.Router.Class (class MonadRouter)
+import Halogen.Router.Class as HR
 
-data Output = Selected Breed
+data Output = Void
 
 type Slot = forall query. H.Slot query Output Unit
 
@@ -29,7 +32,11 @@ data Action
   = Select Breed
   | Receive Input
 
-component :: forall query monad. MonadAff monad => H.Component query Input Output monad
+component ::
+  forall query monad.
+  MonadRouter Route monad =>
+  MonadAff monad =>
+  H.Component query Input Output monad
 component =
   H.mkComponent
     { initialState
@@ -83,8 +90,14 @@ render state =
   where
   anchorStyle = HP.class_ $ wrap "cursor-pointer underline decoration-blue-400 text-sky-500"
 
-handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
+handleAction ::
+  forall slots monad.
+  MonadRouter Route monad =>
+  MonadAff monad =>
+  Action ->
+  H.HalogenM State Action slots Output monad Unit
 handleAction = case _ of
   Receive input -> H.put input
 
-  Select breed -> H.raise $ Selected breed
+  Select breed -> do
+    HR.navigate $ ImagesRoute { breed, page: 1 }
