@@ -4,6 +4,7 @@ package:
     - aff
     - arrays
     - debug
+    - exceptions
     - effect
     - fetch
     - fetch-argonaut

@@ -90,6 +90,7 @@ render state =
             , HH.text $
                 case state.images of
                   Loading -> ""
+                  Error _ -> ""
                   Success images ->
                     show (Array.length images) <> " images"
             ]
@@ -114,6 +115,7 @@ render state =
                 , HH.text $
                     case state.images of
                       Loading -> ""
+                      Error _ -> ""
                       Success _ -> Array.fold
                         [ "page "
                         , show state.page
@@ -134,6 +136,10 @@ render state =
                 , HP.alt "Loading"
                 ]
             ]
+        Error _ ->
+          HH.div
+            [ HP.class_ $ wrap "text-align" ]
+            [ HH.text "An error occurred, contact support" ]
 
         Success images ->
           HH.div [] $
@@ -224,6 +230,7 @@ maxPage { images } =
   where
   n = case images of
     Loading -> 0
+    Error _ -> 0
     Success array -> Array.length array
 
 imageLimit :: Int

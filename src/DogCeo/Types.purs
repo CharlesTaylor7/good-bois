@@ -5,9 +5,11 @@ module DogCeo.Types
   ) where
 
 import Data.Maybe (Maybe)
+import Effect.Exception (Error)
 
 data ApiResult a
   = Loading
+  | Error Error
   | Success a
 
 type BreedGroup =

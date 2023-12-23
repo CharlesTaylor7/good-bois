@@ -69,6 +69,11 @@ render state =
                 ]
             ]
 
+        Error _ ->
+          HH.div
+            [ HP.class_ $ wrap "text-align" ]
+            [ HH.text "An error occurred, contact support" ]
+
         Success breeds ->
           HH.ul [ HP.class_ $ wrap "ml-7 sm:flex flex-col flex-wrap items-start pl-4 h-[80vh] list-disc" ] $
             breeds <#> \breed ->
