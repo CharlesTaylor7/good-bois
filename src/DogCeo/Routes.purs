@@ -1,26 +1,25 @@
 module DogCeo.Routes
-  ( Routes(..)
+  ( Route(..)
   , codec
   ) where
 
 import Prelude
 
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe)
 import DogCeo.Types (Breed)
 import Routing.Duplex (RouteDuplex')
 import Routing.Duplex as R
 import Routing.Duplex.Generic as G
 import Type.Proxy (Proxy(..))
 
-data Routes
+data Route
   = BreedsRoute
   | ImagesRoute { breed :: Breed, page :: Int }
 
-derive instance Eq Routes
-derive instance Generic Routes _
+derive instance Eq Route
+derive instance Generic Route _
 
-codec :: RouteDuplex' Routes
+codec :: RouteDuplex' Route
 codec = R.root $ G.sum
   { "BreedsRoute": G.noArgs
   , "ImagesRoute": R.path "images" $ R.record

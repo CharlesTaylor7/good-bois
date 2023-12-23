@@ -10,34 +10,32 @@ import Data.Array as Array
 import Data.Enum (enumFromTo)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
-import Data.Set (Set)
-import Data.Set as Set
 import DogCeo.Component.Image as Image
+import DogCeo.Routes (Route(..))
 import DogCeo.Types (ApiResult(..), Breed)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Halogen.Router.Class (class MonadRouter)
+import Halogen.Router.Class as HR
 import Record as Record
 import Type.Proxy (Proxy(..))
 
-type Input = Record InputRow
+type Input = { | InputRow }
 
 -- | The input is merged into the state, so we describe its properties in one place as a row type
 type InputRow =
   ( breed :: Breed
+  , page :: Int
   , images :: ApiResult (Array String)
   )
 
 type Slot = forall query. H.Slot query Output Unit
 type Slots = (image :: Image.Slot)
 
-type State =
-  { page :: Int
-  , failedImageLoads :: Set String
-  | InputRow
-  }
+type State = { | InputRow }
 
 data Output = BackToBreeds
 
@@ -46,9 +44,12 @@ data Action
   | Receive Input
   | GotoPreviousPage
   | GotoNextPage
-  | ImageNotFound String
 
-component :: forall query monad. MonadAff monad => H.Component query Input Output monad
+component ::
+  forall query monad.
+  MonadRouter Route monad =>
+  MonadAff monad =>
+  H.Component query Input Output monad
 component =
   H.mkComponent
     { initialState
@@ -60,11 +61,7 @@ component =
     }
 
 initialState :: Input -> State
-initialState =
-  Record.merge
-    { page: 1
-    , failedImageLoads: Set.empty
-    }
+initialState = Record.merge {}
 
 render :: forall monad. State -> H.ComponentHTML Action Slots monad
 render state =
@@ -142,7 +139,12 @@ render state =
   where
   buttonStyle = HP.class_ $ wrap "border rounded-lg py-2 px-4 bg-sky-300 disabled:bg-slate-200"
 
-handleAction :: forall monad. MonadAff monad => Action -> H.HalogenM State Action Slots Output monad Unit
+handleAction ::
+  forall monad.
+  MonadRouter Route monad =>
+  MonadAff monad =>
+  Action ->
+  H.HalogenM State Action Slots Output monad Unit
 handleAction =
   case _ of
     NavBackToBreeds ->
@@ -151,15 +153,13 @@ handleAction =
     Receive input ->
       H.modify_ $ Record.merge input
 
-    GotoPreviousPage ->
-      H.modify_ $ \state -> state { page = state.page - 1 }
+    GotoPreviousPage -> do
+      { breed, page } <- H.get
+      HR.navigate $ ImagesRoute { breed, page: page - 1 }
 
-    GotoNextPage ->
-      H.modify_ $ \state -> state { page = state.page + 1 }
-
-    ImageNotFound src ->
-      H.modify_ $ \state -> state
-        { failedImageLoads = state.failedImageLoads # Set.insert src }
+    GotoNextPage -> do
+      { breed, page } <- H.get
+      HR.navigate $ ImagesRoute { breed, page: page + 1 }
 
 {-
   Pagination utilities

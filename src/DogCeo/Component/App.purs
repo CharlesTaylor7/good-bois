@@ -11,10 +11,13 @@ import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Api.Images as ImagesApi
 import DogCeo.Component.Breeds as BreedsPage
 import DogCeo.Component.Images as ImagesPage
-import DogCeo.Types (ApiResult(..), Breed, BreedGroup, Page(..))
+import DogCeo.Routes (Route(..))
+import DogCeo.Types (ApiResult(..), Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
+import Halogen.Router.Class (class MonadRouter)
+import Halogen.Router.Class as HR
 import Type.Proxy (Proxy(..))
 
 type Slots =
@@ -28,15 +31,20 @@ _imagesPage = Proxy :: Proxy "imagesPage"
 type State =
   { breeds :: ApiResult (Array BreedGroup)
   , imagesCache :: Map Breed (Array String)
-  , page :: Page
+  , route :: Maybe Route
   }
 
 data Action
   = Init
+  | ChangeRoute Route
   | HandleBreedsPage BreedsPage.Output
   | HandleImagesPage ImagesPage.Output
 
-component :: forall query input output monad. MonadAff monad => H.Component query input output monad
+component ::
+  forall query input output monad.
+  MonadRouter Route monad =>
+  MonadAff monad =>
+  H.Component query input output monad
 component =
   H.mkComponent
     { initialState
@@ -51,21 +59,30 @@ initialState :: forall input. input -> State
 initialState _ =
   { breeds: Loading
   , imagesCache: Map.empty
-  , page: BreedsPage
+  , route: Just BreedsRoute
   }
 
-render :: forall monad. MonadAff monad => State -> H.ComponentHTML Action Slots monad
+render ::
+  forall monad.
+  MonadRouter Route monad =>
+  MonadAff monad =>
+  State ->
+  H.ComponentHTML Action Slots monad
 render state =
-  case state.page of
-    BreedsPage ->
+  case state.route of
+    Nothing ->
+      HH.text ""
+
+    Just BreedsRoute ->
       HH.slot _breedsPage unit BreedsPage.component
         { breeds: state.breeds
         }
         HandleBreedsPage
 
-    ImagesPage { breed } ->
+    Just (ImagesRoute { breed, page }) ->
       HH.slot _imagesPage unit ImagesPage.component
         { breed
+        , page
         , images:
             state.imagesCache
               # Map.lookup breed
@@ -73,18 +90,30 @@ render state =
         }
         HandleImagesPage
 
-handleAction :: forall output monad. MonadAff monad => Action -> H.HalogenM State Action Slots output monad Unit
+handleAction ::
+  forall output monad.
+  MonadRouter Route monad =>
+  MonadAff monad =>
+  Action ->
+  H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
   Init -> do
+    emitter <- HR.emitMatched
+    void $ H.subscribe (ChangeRoute <$> emitter)
     void $ H.fork $ do
       breeds <- BreedsApi.fetch
       H.modify_ \state -> state
         { breeds = Success breeds
         }
 
+  ChangeRoute route -> do
+    H.modify_ \state -> state { route = Just route }
+
   -- Fetches the images if we haven't selected this breed before
   -- Navigate to the images page for this breed
   HandleBreedsPage (BreedsPage.Selected breed) -> do
+    HR.navigate $ ImagesRoute { breed, page: 1 }
+
     { imagesCache } <- H.get
     when (Map.lookup breed imagesCache == Nothing) $ void $ H.fork $ do
       images <- ImagesApi.fetch breed
@@ -92,8 +121,5 @@ handleAction = case _ of
         { imagesCache = state.imagesCache # Map.insert breed images
         }
 
-    H.modify_ \state -> state
-      { page = ImagesPage { breed } }
-
   HandleImagesPage ImagesPage.BackToBreeds ->
-    H.modify_ \state -> state { page = BreedsPage }
+    HR.navigate BreedsRoute
