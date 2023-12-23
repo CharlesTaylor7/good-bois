@@ -17,7 +17,7 @@ import Halogen.HTML.Properties as HP
 
 data Output = Selected Breed
 
-type Slot = forall query. H.Slot query Output Unit
+type Slot id = forall query. H.Slot query Output id
 
 type Input = State
 

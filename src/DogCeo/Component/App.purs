@@ -18,8 +18,8 @@ import Halogen.HTML as HH
 import Type.Proxy (Proxy(..))
 
 type Slots =
-  ( breedsPage :: BreedsPage.Slot
-  , imagesPage :: ImagesPage.Slot
+  ( breedsPage :: BreedsPage.Slot Unit
+  , imagesPage :: ImagesPage.Slot Unit
   )
 
 _breedsPage = Proxy :: Proxy "breedsPage"
