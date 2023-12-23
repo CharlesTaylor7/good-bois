@@ -5,7 +5,6 @@ module DogCeo.Component.App
 import Debug
 import Prelude
 
-import Data.Foldable (for_)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), fromMaybe, maybe)

@@ -9,6 +9,8 @@ import Prelude
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
+import Data.Set (Set)
+import Data.Set as Set
 import Debug (spy)
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (ApiResult(..), Breed)
@@ -20,7 +22,6 @@ import Halogen.HTML.Properties as HP
 import Halogen.Router.Class (class MonadRouter)
 import Halogen.Router.Class as HR
 import Record as Record
-import Type.Proxy (Proxy(..))
 
 type Input = { | InputRow }
 data Output = FetchImages
@@ -35,7 +36,10 @@ type InputRow =
 type Slot = forall query. H.Slot query Output Unit
 type Slots = ()
 
-type State = { | InputRow }
+type State =
+  { failedImageSources :: Set String
+  | InputRow
+  }
 
 data Action
   = Init
@@ -43,6 +47,7 @@ data Action
   | NavBackToBreeds
   | GotoPreviousPage
   | GotoNextPage
+  | ImageNotFound String
 
 component ::
   forall query monad.
@@ -61,7 +66,7 @@ component =
     }
 
 initialState :: Input -> State
-initialState = Record.merge {}
+initialState = Record.merge { failedImageSources: Set.empty }
 
 render :: forall monad. State -> H.ComponentHTML Action Slots monad
 render state =
@@ -137,12 +142,25 @@ render state =
                 pageImages { page: state.page, images } <#> \src ->
                   HH.img
                     [ HP.src src
-                    --, HE.onError \_ -> ImageNotFound
+                    , HE.onError \_ -> ImageNotFound src
                     , HP.class_ $ wrap $ Array.intercalate " "
                         [ "object-cover h-96 rounded"
-                        --, if imageNotFound then "hidden" else ""
+                        , if src `Set.member` state.failedImageSources then "hidden" else ""
                         ]
                     ]
+            , let
+                failedImgCount =
+                  pageImages { page: state.page, images }
+                    # Array.filter (\src -> src `Set.member` state.failedImageSources)
+                    # Array.length
+              in
+                HH.div
+                  [ HP.class_ $ wrap $ Array.intercalate " "
+                      [ "text-center"
+                      , if failedImgCount == 0 then "hidden" else ""
+                      ]
+                  ]
+                  [ HH.text $ show failedImgCount <> " images failed to load." ]
 
             --| Prefetches the next page of images
             --| Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src attributes. 
@@ -184,6 +202,9 @@ handleAction =
     GotoNextPage -> do
       { breed, page } <- H.get
       HR.navigate $ ImagesRoute { breed, page: page + 1 }
+
+    ImageNotFound src -> do
+      H.modify_ \state -> state { failedImageSources = state.failedImageSources # Set.insert src }
 
 {-
   Pagination utilities
