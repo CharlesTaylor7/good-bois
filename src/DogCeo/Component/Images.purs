@@ -228,12 +228,19 @@ handleAction =
       HR.navigate BreedsRoute
 
     GotoPreviousPage -> do
+      route <- HR.current
       { breed, page } <- H.get
-      HR.navigate $ ImagesRoute { breed, page: page - 1 }
+      let slow = true
+
+      HR.navigate
+        { slow: route # maybe false _.slow
+        , page: HR.navigate $ ImagesRoute { breed, page: page - 1 }
+        }
 
     GotoNextPage -> do
       { breed, page } <- H.get
-      HR.navigate $ ImagesRoute { breed, page: page + 1 }
+      let slow = true
+      HR.navigate $ ImagesRoute { slow, breed, page: page + 1 }
 
     ImageNotFound src -> do
       H.modify_ \state -> state { failedImages = state.failedImages # Set.insert src }
