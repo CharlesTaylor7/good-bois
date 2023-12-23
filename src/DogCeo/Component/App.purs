@@ -2,6 +2,7 @@ module DogCeo.Component.App
   ( component
   ) where
 
+import Debug
 import Prelude
 
 import Data.Foldable (for_)
@@ -48,7 +49,7 @@ component =
     { initialState
     , render
     , eval: H.mkEval $ H.defaultEval
-        { handleAction = handleAction
+        { handleAction = spy "App" >>> handleAction
         , initialize = Just Init
         }
     }

@@ -8,6 +8,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
+import Debug (spy)
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (ApiResult(..), Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)
@@ -43,7 +44,8 @@ component =
     { initialState
     , render
     , eval: H.mkEval $ H.defaultEval
-        { handleAction = handleAction
+        { handleAction = spy "BreedsPage" >>> handleAction
+        , initialize = Just Init
         , receive = Just <<< Receive
         }
     }

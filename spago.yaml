@@ -3,6 +3,7 @@ package:
   dependencies:
     - aff
     - arrays
+    - debug
     - effect
     - enums
     - fetch

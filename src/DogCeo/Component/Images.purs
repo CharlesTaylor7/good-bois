@@ -10,6 +10,7 @@ import Data.Array as Array
 import Data.Enum (enumFromTo)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
+import Debug (spy)
 import DogCeo.Component.Image as Image
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (ApiResult(..), Breed)
@@ -55,7 +56,7 @@ component =
     { initialState
     , render
     , eval: H.mkEval $ H.defaultEval
-        { handleAction = handleAction
+        { handleAction = spy "ImagesPage" >>> handleAction
         , initialize = Just Init
         , receive = Just <<< Receive
         }
