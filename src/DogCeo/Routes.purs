@@ -1,6 +1,6 @@
 module DogCeo.Routes
   ( Routes(..)
-  , routesCodec
+  , codec
   ) where
 
 import Prelude
@@ -20,8 +20,8 @@ data Routes
 derive instance Eq Routes
 derive instance Generic Routes _
 
-routesCodec :: RouteDuplex' Routes
-routesCodec = R.root $ G.sum
+codec :: RouteDuplex' Routes
+codec = R.root $ G.sum
   { "BreedsRoute": G.noArgs
   , "ImagesRoute": R.path "images" $ R.record
       # R.prop (Proxy :: _ "breed")

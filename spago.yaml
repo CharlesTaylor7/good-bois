@@ -10,12 +10,12 @@ package:
     - foldable-traversable
     - foreign-object
     - halogen
+    - halogen-router
     - maybe
     - newtype
     - ordered-collections
     - prelude
     - record
-    - routing
     - routing-duplex
     - tuples
   build:
@@ -26,6 +26,25 @@ workspace:
   build_opts:
     censor_library_warnings: all
   extra_packages:
+    halogen-router:
+      git: https://github.com/katsujukou/purescript-halogen-router
+      ref: e25e7bbb7a32011c3f8c48c04612d5909455b035
+      dependencies:
+        - aff
+        - effect
+        - either
+        - foreign
+        - halogen
+        - halogen-hooks
+        - halogen-store
+        - halogen-subscriptions
+        - maybe
+        - prelude
+        - routing
+        - routing-duplex
+        - safe-coerce
+        - transformers
+        - tuples
     spec-quickcheck:
       dependencies:
         - aff
