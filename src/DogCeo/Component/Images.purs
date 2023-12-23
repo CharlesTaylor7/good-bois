@@ -150,7 +150,7 @@ render state =
                     [ HP.src src
                     , HE.onError \_ -> ImageNotFound src
                     , HP.class_ $ wrap $ Array.intercalate " "
-                        [ "object-cover h-96 rounded"
+                        [ "object-cover h-96 w-96 rounded"
                         , if src `Set.member` state.failedImageSources then "hidden" else ""
                         ]
                     ]
