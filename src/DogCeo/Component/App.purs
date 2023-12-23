@@ -98,6 +98,9 @@ handleAction ::
   H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
   Init -> do
+    route <- HR.current
+    H.modify_ \state -> state { route = route }
+
     emitter <- HR.emitMatched
     void $ H.subscribe (ChangeRoute <$> emitter)
     void $ H.fork $ do
