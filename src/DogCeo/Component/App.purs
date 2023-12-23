@@ -8,7 +8,7 @@ import Prelude
 import Data.Foldable (for_)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Api.Images as ImagesApi
 import DogCeo.Component.Breeds as BreedsPage
@@ -30,7 +30,7 @@ type Slots =
 type State =
   { breeds :: ApiResult (Array BreedGroup)
   , imagesCache :: Map Breed (Array String)
-  , route :: Route
+  , route :: Maybe Route
   }
 
 data Action
@@ -58,7 +58,7 @@ initialState :: forall input. input -> State
 initialState _ =
   { breeds: Loading
   , imagesCache: Map.empty
-  , route: BreedsRoute
+  , route: Nothing
   }
 
 render ::
@@ -69,7 +69,10 @@ render ::
   H.ComponentHTML Action Slots monad
 render state =
   case state.route of
-    BreedsRoute ->
+    Nothing ->
+      HH.text ""
+
+    Just BreedsRoute ->
       HH.slot
         (Proxy :: _ "breedsPage")
         unit
@@ -78,7 +81,7 @@ render state =
         }
         HandleBreedsPage
 
-    ImagesRoute { breed, page } ->
+    Just (ImagesRoute { breed, page }) ->
       HH.slot
         (Proxy :: _ "imagesPage")
         unit
@@ -100,15 +103,15 @@ handleAction ::
   H.HalogenM State Action Slots output monad Unit
 handleAction = case _ of
   Init -> do
-    currentRoute <- HR.current
-    for_ currentRoute $ \route ->
-      H.modify_ \state -> state { route = route }
+    route <- HR.current
+    H.modify_ \state -> state
+      { route = Just $ (route # fromMaybe BreedsRoute) }
 
     emitter <- HR.emitMatched
     void $ H.subscribe (RouteChanged <$> emitter)
 
   RouteChanged route -> do
-    H.modify_ \state -> state { route = route }
+    H.modify_ \state -> state { route = Just route }
 
   HandleBreedsPage BreedsPage.FetchBreeds -> do
     breeds <- BreedsApi.fetch
