@@ -74,61 +74,7 @@ render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
   HH.div
     []
-    [ HH.div [ HP.class_ $ wrap "m-6 flex flex-row flex-wrap items-center justify-evenly " ]
-        [ HH.a
-            [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
-            , HE.onClick \_ -> NavBackToBreeds
-            ]
-            [ HH.text "Back to Breeds" ]
-
-        , HH.div
-            [ HP.class_ $ wrap "flex flex-col items-center" ]
-            [ HH.h2
-                [ HP.class_ $ wrap "text-xl font-semibold capitalize" ]
-                [ HH.text $
-                    case state.breed.subBreed of
-                      Just subBreed -> subBreed <> " " <> state.breed.name
-                      Nothing -> state.breed.name
-                ]
-            , HH.text $
-                case state.images of
-                  Api.Loading -> ""
-                  Api.Error _ -> ""
-                  Api.Success images ->
-                    show (Array.length images) <> " images"
-            ]
-
-        , HH.div [ HP.class_ $ wrap "text-center" ] $
-            [ HH.div
-                [ HP.class_ $ wrap "flex flex-row items-center gap-2" ]
-                [ HH.button
-                    [ buttonStyle
-                    , HP.disabled $ state.page <= minPage
-                    , HE.onClick \_ -> GotoPreviousPage
-                    ]
-                    [ HH.text "Previous" ]
-
-                , HH.button
-                    [ buttonStyle
-                    , HP.disabled $ state.page >= maxPage state
-                    , HE.onClick \_ -> GotoNextPage
-                    ]
-                    [ HH.text "Next" ]
-
-                , HH.text $
-                    case state.images of
-                      Api.Loading -> ""
-                      Api.Error _ -> ""
-                      Api.Success _ -> Array.fold
-                        [ "page "
-                        , show state.page
-                        , " of "
-                        , show $ maxPage state
-                        ]
-                ]
-            ]
-        ]
-
+    [ renderHeader state
     , case state.images of
         Api.Loading ->
           HH.div
@@ -195,6 +141,64 @@ render state =
                     ]
             ]
     ]
+
+renderHeader :: forall monad. State -> H.ComponentHTML Action () monad
+renderHeader state =
+  HH.div [ HP.class_ $ wrap "m-6 flex flex-row flex-wrap items-center justify-evenly " ]
+    [ HH.a
+        [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
+        , HE.onClick \_ -> NavBackToBreeds
+        ]
+        [ HH.text "Back to Breeds" ]
+
+    , HH.div
+        [ HP.class_ $ wrap "flex flex-col items-center" ]
+        [ HH.h2
+            [ HP.class_ $ wrap "text-xl font-semibold capitalize" ]
+            [ HH.text $
+                case state.breed.subBreed of
+                  Just subBreed -> subBreed <> " " <> state.breed.name
+                  Nothing -> state.breed.name
+            ]
+        , HH.text $
+            case state.images of
+              Api.Loading -> ""
+              Api.Error _ -> ""
+              Api.Success images ->
+                show (Array.length images) <> " images"
+        ]
+
+    , HH.div [ HP.class_ $ wrap "text-center" ] $
+        [ HH.div
+            [ HP.class_ $ wrap "flex flex-row items-center gap-2" ]
+            [ HH.button
+                [ buttonStyle
+                , HP.disabled $ state.page <= minPage
+                , HE.onClick \_ -> GotoPreviousPage
+                ]
+                [ HH.text "Previous" ]
+
+            , HH.button
+                [ buttonStyle
+                , HP.disabled $ state.page >= maxPage state
+                , HE.onClick \_ -> GotoNextPage
+                ]
+                [ HH.text "Next" ]
+
+            , HH.text $
+                case state.images of
+                  Api.Loading -> ""
+                  Api.Error _ -> ""
+                  Api.Success _ -> Array.fold
+                    [ "page "
+                    , show state.page
+                    , " of "
+                    , show $ maxPage state
+                    ]
+            ]
+        ]
+    ]
+
   where
   buttonStyle = HP.class_ $ wrap "border rounded-lg py-2 px-4 bg-sky-300 disabled:bg-slate-200"
 
