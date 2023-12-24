@@ -183,20 +183,6 @@ render state =
                         ]
 
                     ]
-            , let
-                failedImgCount =
-                  pageImages { page: state.page, images }
-                    # Array.filter (\src -> imgStatus src state == ErrorImage)
-                    # Array.length
-              in
-                HH.div
-                  [ HP.class_ $ wrap $ Array.intercalate " "
-                      [ "text-center"
-                      , if failedImgCount == 0 then "hidden" else ""
-                      ]
-                  ]
-                  [ HH.text $ show failedImgCount <> " images failed to load." ]
-
             --| Prefetches the next page of images
             --| Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src attributes. 
             --| This means after clicking 'Next', you can see stale images from the previous page while the new image is loading.
