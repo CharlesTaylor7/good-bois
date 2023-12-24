@@ -168,6 +168,15 @@ render state =
                             , if imgStatus src state /= LoadingImage then "hidden" else ""
                             ]
                         ]
+                    , HH.img
+                        [ HP.src "/static/error.png"
+                        , HP.alt $ src <> " failed to load"
+                        , HP.class_ $ wrap $ Array.intercalate " "
+                            [ "object-cover h-96 w-96 rounded"
+
+                            , if imgStatus src state /= ErrorImage then "hidden" else ""
+                            ]
+                        ]
                     ]
             , let
                 failedImgCount =
