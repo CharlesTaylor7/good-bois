@@ -7,10 +7,10 @@ module DogCeo.Component.Images
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Map (Map)
+import Data.Map as Map
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (wrap)
-import Data.Set (Set)
-import Data.Set as Set
 import DogCeo.Api.Utils as Api
 import DogCeo.Types (Breed)
 import Effect.Aff.Class (class MonadAff)
@@ -32,10 +32,16 @@ type Slot id = forall query. H.Slot query Output id
 
 type State =
   { page :: Int
-  , failedImages :: Set String
-  , loadedImages :: Set String
+  , imageStatus :: Map String ImageLoad
   | InputRow
   }
+
+data ImageLoad
+  = LoadingImage
+  | LoadedImage
+  | ErrorImage
+
+derive instance Eq ImageLoad
 
 data Output = BackToBreeds
 
@@ -61,8 +67,7 @@ component =
 initialState :: Input -> State
 initialState = Record.merge
   { page: minPage
-  , failedImages: Set.empty
-  , loadedImages: Set.empty
+  , imageStatus: Map.empty
   }
 
 render :: forall monad. State -> H.ComponentHTML Action () monad
@@ -150,10 +155,8 @@ render state =
                         , HE.onError \_ -> ImageNotFound src
                         , HP.class_ $ wrap $ Array.intercalate " "
                             [ "object-cover h-96 w-96 rounded"
-                            , if
-                                not (src `Set.member` state.loadedImages) ||
-                                  (src `Set.member` state.failedImages) then "hidden"
-                              else ""
+
+                            , if imgStatus src state /= LoadedImage then "hidden" else ""
                             ]
                         ]
 
@@ -162,14 +165,14 @@ render state =
                         , HP.alt "Loading"
                         , HP.class_ $ wrap $ Array.intercalate " "
                             [ "object-cover h-96 w-96 rounded"
-                            , if src `Set.member` state.loadedImages then "hidden" else ""
+                            , if imgStatus src state /= LoadingImage then "hidden" else ""
                             ]
                         ]
                     ]
             , let
                 failedImgCount =
                   pageImages { page: state.page, images }
-                    # Array.filter (\src -> src `Set.member` state.failedImages)
+                    # Array.filter (\src -> imgStatus src state == ErrorImage)
                     # Array.length
               in
                 HH.div
@@ -211,10 +214,22 @@ handleAction =
       H.modify_ $ \state -> state { page = state.page + 1 }
 
     ImageNotFound src -> do
-      H.modify_ \state -> state { failedImages = state.failedImages # Set.insert src }
+      H.modify_ \state -> state
+        { imageStatus = state.imageStatus
+            # Map.insert src ErrorImage
+        }
 
     ImageLoaded src -> do
-      H.modify_ \state -> state { loadedImages = state.loadedImages # Set.insert src }
+      H.modify_ \state -> state
+        { imageStatus = state.imageStatus
+            # Map.insert src LoadedImage
+        }
+
+imgStatus :: String -> State -> ImageLoad
+imgStatus src state =
+  state.imageStatus
+    # Map.lookup src
+    # fromMaybe LoadingImage
 
 {-
   Pagination utilities
