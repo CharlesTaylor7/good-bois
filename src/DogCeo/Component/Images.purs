@@ -137,7 +137,7 @@ render state =
             currentPageImages { page: state.page, images } <#> \src ->
               HH.img
                 [ HP.src src
-                , HP.class_ $ wrap "object-cover h-96 rounded"
+                , HP.class_ $ wrap "object-cover h-96 w-96 rounded"
                 ]
     ]
   where
