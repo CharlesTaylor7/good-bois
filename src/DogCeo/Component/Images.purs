@@ -75,71 +75,7 @@ render state =
   HH.div
     []
     [ renderHeader state
-    , case state.images of
-        Api.Loading ->
-          HH.div
-            [ HP.class_ $ wrap "flex justify-center"
-            ]
-            [ HH.img
-                [ HP.src "/static/loading.gif"
-                , HP.alt "Loading"
-                ]
-            ]
-        Api.Error _ ->
-          HH.div
-            [ HP.class_ $ wrap "text-center" ]
-            [ HH.text "An error occurred, contact support" ]
-
-        Api.Success images ->
-          HH.div [] $
-            [ HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
-                pageImages { page: state.page, images } <#> \src ->
-                  HH.div []
-                    [ HH.img
-                        [ HP.src src
-                        , HE.onLoad \_ -> ImageLoaded src
-                        , HE.onError \_ -> ImageNotFound src
-                        , HP.class_ $ wrap $ Array.intercalate " "
-                            [ "object-cover h-96 w-96 rounded"
-
-                            , if imgStatus src state /= LoadedImage then "hidden" else ""
-                            ]
-                        ]
-
-                    , HH.img
-                        [ HP.src "/static/loading.gif"
-                        , HP.alt "Loading"
-                        , HP.class_ $ wrap $ Array.intercalate " "
-                            [ "object-cover h-96 w-96 rounded"
-                            , if imgStatus src state /= LoadingImage then "hidden" else ""
-                            ]
-                        ]
-                    , HH.div
-                        [ HP.class_ $ wrap $ Array.intercalate " "
-                            [ "flex h-96 w-96 rounded items-center justify-center"
-
-                            , if imgStatus src state /= ErrorImage then "hidden" else ""
-                            ]
-                        ]
-                        [ HH.img
-                            [ HP.src "/static/image-not-found.png"
-                            , HP.alt $ src <> " failed to load"
-                            , HP.class_ $ wrap "h-32 w-32"
-                            ]
-                        ]
-
-                    ]
-            --| Prefetches the next page of images
-            --| Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src attributes. 
-            --| This means after clicking 'Next', you can see stale images from the previous page while the new image is loading.
-            --| Prefetching images allows images to swap out seemlessly after clicking the Next button.
-            , HH.div [] $
-                pageImages { page: state.page + 1, images } <#> \src ->
-                  HH.link
-                    [ HP.rel "prefetch"
-                    , HP.href src
-                    ]
-            ]
+    , renderImages state
     ]
 
 renderHeader :: forall monad. State -> H.ComponentHTML Action () monad
@@ -201,6 +137,74 @@ renderHeader state =
 
   where
   buttonStyle = HP.class_ $ wrap "border rounded-lg py-2 px-4 bg-sky-300 disabled:bg-slate-200"
+
+renderImages :: forall monad. State -> H.ComponentHTML Action () monad
+renderImages state =
+  case state.images of
+    Api.Loading ->
+      HH.div
+        [ HP.class_ $ wrap "flex justify-center"
+        ]
+        [ HH.img
+            [ HP.src "/static/loading.gif"
+            , HP.alt "Loading"
+            ]
+        ]
+    Api.Error _ ->
+      HH.div
+        [ HP.class_ $ wrap "text-center" ]
+        [ HH.text "An error occurred, contact support" ]
+
+    Api.Success images ->
+      HH.div [] $
+        [ HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ] $
+            pageImages { page: state.page, images } <#> \src ->
+              HH.div []
+                [ HH.img
+                    [ HP.src src
+                    , HE.onLoad \_ -> ImageLoaded src
+                    , HE.onError \_ -> ImageNotFound src
+                    , HP.class_ $ wrap $ Array.intercalate " "
+                        [ "object-cover h-96 w-96 rounded"
+
+                        , if imgStatus src state /= LoadedImage then "hidden" else ""
+                        ]
+                    ]
+
+                , HH.img
+                    [ HP.src "/static/loading.gif"
+                    , HP.alt "Loading"
+                    , HP.class_ $ wrap $ Array.intercalate " "
+                        [ "object-cover h-96 w-96 rounded"
+                        , if imgStatus src state /= LoadingImage then "hidden" else ""
+                        ]
+                    ]
+                , HH.div
+                    [ HP.class_ $ wrap $ Array.intercalate " "
+                        [ "flex h-96 w-96 rounded items-center justify-center"
+
+                        , if imgStatus src state /= ErrorImage then "hidden" else ""
+                        ]
+                    ]
+                    [ HH.img
+                        [ HP.src "/static/image-not-found.png"
+                        , HP.alt $ src <> " failed to load"
+                        , HP.class_ $ wrap "h-32 w-32"
+                        ]
+                    ]
+
+                ]
+        --| Prefetches the next page of images
+        --| Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src attributes. 
+        --| This means after clicking 'Next', you can see stale images from the previous page while the new image is loading.
+        --| Prefetching images allows images to swap out seemlessly after clicking the Next button.
+        , HH.div [] $
+            pageImages { page: state.page + 1, images } <#> \src ->
+              HH.link
+                [ HP.rel "prefetch"
+                , HP.href src
+                ]
+        ]
 
 handleAction :: forall slots monad. MonadAff monad => Action -> H.HalogenM State Action slots Output monad Unit
 handleAction =
