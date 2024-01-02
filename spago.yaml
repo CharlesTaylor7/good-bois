@@ -1,5 +1,5 @@
 package:
-  name: dog-breed-ui
+  name: dog-ceo-ui
   dependencies:
     - aff
     - arrays
@@ -20,15 +20,5 @@ package:
 workspace:
   build_opts:
     censor_library_warnings: all
-  extra_packages:
-    spec-quickcheck:
-      dependencies:
-        - aff
-        - prelude
-        - quickcheck
-        - random
-        - spec
-      git: https://github.com/CharlesTaylor7/purescript-spec-quickcheck.git
-      ref: master
   package_set:
     registry: 47.7.1
