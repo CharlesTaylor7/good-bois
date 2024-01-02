@@ -1,6 +1,6 @@
 workspace:
   packages:
-    dog-breed-ui:
+    dog-ceo-ui:
       path: ./
       dependencies:
         - aff
@@ -568,16 +568,7 @@ workspace:
       yoga-postgres: 6.0.0
       yoga-tree: 1.0.0
       z3: 0.0.2
-  extra_packages:
-    spec-quickcheck:
-      git: https://github.com/CharlesTaylor7/purescript-spec-quickcheck.git
-      ref: master
-      dependencies:
-        - aff
-        - prelude
-        - quickcheck
-        - random
-        - spec
+  extra_packages: {}
 packages:
   aff:
     type: registry
