@@ -3,7 +3,8 @@
 The app is live at: https://good-bois.netlify.app/
 
 If you prefer to build and run locally:
-```
+
+```bash
 # install dev tools, and purescript deps
 npm install 
 
