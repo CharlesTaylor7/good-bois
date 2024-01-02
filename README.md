@@ -32,7 +32,6 @@ This component is the actual image viewer, that handles paginating though images
 
 Some of the image urls returned by the dog.ceo API are dead links. 
 If a link is dead, the image is replaced with a custom error image.
-( You can see examples of this on the first page of pugs. )
 
 While an image is loading, a placeholder loading gif is shown in its place.
 Since images do not load instantly and can load out of order, this helps reduce jarring  "popping" and "sliding" of elements.
