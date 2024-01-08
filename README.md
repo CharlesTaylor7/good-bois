@@ -1,9 +1,4 @@
-## How to Demo
-
-The app is live at: https://good-bois.netlify.app/
-
-If you prefer to build and run locally:
-
+## How to Build
 ```bash
 # install dev tools, and purescript deps
 npm install 
@@ -14,7 +9,6 @@ npm run build
 # start the dev server with vite
 npm run watch:js 
 ```
-
 
 ### Notes
 This dog image viewer, is built with Halogen. It has 3 main components, all defined in the `src/DogCeo/Components/` directory.
