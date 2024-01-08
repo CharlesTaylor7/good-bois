@@ -93,11 +93,12 @@ handleAction = case _ of
 
       -- if the page is in a loading state or previously errored
       -- then fetch the images
-      _ -> void $ H.fork $ do
-        images <- ImagesApi.fetch breed
+      _ -> do
+        void $ H.fork $ do
+          images <- ImagesApi.fetch breed
 
-        H.modify_ \s -> s
-          { imagesCache = state.imagesCache # Map.insert breed images }
+          H.modify_ \s -> s
+            { imagesCache = state.imagesCache # Map.insert breed images }
 
         H.modify_ \s -> s
           { page = ImagesPage { breed } }
