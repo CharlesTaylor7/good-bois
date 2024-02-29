@@ -22,7 +22,7 @@ derive instance Eq Route
 derive instance Generic Route _
 
 codec :: RouteDuplex' Route
-codec = R.root $ G.sum
+codec = R.root $ R.prefix "good-bois" $ G.sum
   { "BreedsRoute": G.noArgs
   , "ImagesRoute": R.path "images" $ R.record
       # prop @"page" (R.int $ R.param "page")
