@@ -1,0 +1,3 @@
+- [ ] Daisy UI
+- [ ] PWA
+- [ ] Client side routing
