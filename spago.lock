@@ -1,6 +1,6 @@
 workspace:
   packages:
-    dog-breed-ui:
+    good-bois:
       path: ./
       dependencies:
         - aff

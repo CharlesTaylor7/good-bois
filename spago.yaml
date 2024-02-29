@@ -1,5 +1,5 @@
 package:
-  name: dog-breed-ui
+  name: good-bois
   dependencies:
     - aff
     - arrays
