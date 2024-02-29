@@ -15,7 +15,6 @@ import DogCeo.Component.Images.View as View
 import DogCeo.Routes (Route(..))
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
-import Halogen.HTML.Properties as HP
 import Halogen.Router.Class (class MonadRouter)
 import Halogen.Router.Class as HR
 import Record as Record
