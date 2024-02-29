@@ -6,10 +6,10 @@
   "type": "module",
   "scripts": {
     "postinstall": "spago install",
-    "watch:js": "vite --port=3000 public",
+    "watch:js": "vite --config=vite.config.ts --port=3000 public",
     "watch:purs": "watchexec -e purs,yaml,js -- npm run build",
     "build": "spago build",
-    "bundle": "npm run build && vite build public --outDir=../dist && cp -r public/static dist/"
+    "bundle": "npm run build && vite build --config=vite.config.ts --outDir=../dist public && cp -r public/static dist/"
   },
   "devDependencies": {
     "purescript": "0.15.13",
