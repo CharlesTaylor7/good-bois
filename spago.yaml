@@ -3,7 +3,6 @@ package:
   dependencies:
     - aff
     - arrays
-    - debug
     - exceptions
     - effect
     - either

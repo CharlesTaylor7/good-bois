@@ -7,7 +7,6 @@ import Prelude
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), fromMaybe)
-import Debug (spy)
 import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Api.Images as ImagesApi
 import DogCeo.Api.Utils as Api
@@ -15,9 +14,7 @@ import DogCeo.Component.Breeds as BreedsPage
 import DogCeo.Component.Images as ImagesPage
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (Breed, BreedGroup)
-import Effect.Aff (Milliseconds(..), delay)
 import Effect.Aff.Class (class MonadAff)
-import Halogen (liftAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.Router.Class (class MonadRouter)
@@ -51,7 +48,7 @@ component =
     { initialState
     , render
     , eval: H.mkEval $ H.defaultEval
-        { handleAction = spy "App" >>> handleAction
+        { handleAction = handleAction
         , initialize = Just Init
         }
     }

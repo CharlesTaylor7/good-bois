@@ -8,7 +8,6 @@ import Prelude
 
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Debug (spy)
 import DogCeo.Api.Utils as Api
 import DogCeo.Component.Images.Types (Action(..), ImageLoad(..), Input, State)
 import DogCeo.Component.Images.View as View
@@ -32,7 +31,7 @@ component =
     { initialState
     , render: View.render
     , eval: H.mkEval $ H.defaultEval
-        { handleAction = spy "ImagesPage" >>> handleAction
+        { handleAction = handleAction
         , initialize = Just Init
         , receive = Just <<< Receive
         }

@@ -8,7 +8,6 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
-import Debug (spy)
 import DogCeo.Api.Utils as Api
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (Breed, BreedGroup)
@@ -45,7 +44,7 @@ component =
     { initialState
     , render
     , eval: H.mkEval $ H.defaultEval
-        { handleAction = spy "BreedsPage" >>> handleAction
+        { handleAction = handleAction
         , initialize = Just Init
         , receive = Just <<< Receive
         }
