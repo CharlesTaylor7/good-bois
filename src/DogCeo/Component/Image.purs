@@ -57,15 +57,6 @@ render state =
   HH.div
     [ HP.class_ $ wrap "relative h-96 w-96" ]
     [ HH.img
-        [ HP.src state.current
-        , HE.onLoad \_ -> ImageLoaded
-        , HE.onError \_ -> ImageNotFound
-        , HP.class_ $ wrap $ Array.intercalate " "
-            [ "absolute h-full w-full object-cover rounded transition-opacity"
-            , if state.status /= LoadedImage then "opacity-0" else "opacity-100"
-            ]
-        ]
-    , HH.img
         [ HP.src "/good-bois/static/loading.gif"
         , HP.alt "Loading"
         , HP.class_ $ wrap $ Array.intercalate " "
@@ -73,6 +64,7 @@ render state =
             , if state.status /= LoadingImage then "opacity-0" else "opacity-100"
             ]
         ]
+
     , HH.div
         [ HP.class_ $ wrap $ Array.intercalate " "
             [ "absolute h-full w-full flex rounded items-center justify-center transition-opacity"
@@ -85,6 +77,25 @@ render state =
             , HP.class_ $ wrap "h-32 w-32"
             ]
         ]
+
+    , HH.img
+        [ HP.src $ fromMaybe "" state.previous
+        , HP.class_ $ wrap $ Array.intercalate " "
+            [ "absolute h-full w-full object-cover rounded transition-opacity"
+            , if state.status /= LoadedImage then "opacity-0" else "opacity-100"
+            ]
+        ]
+
+    , HH.img
+        [ HP.src state.current
+        , HE.onLoad \_ -> ImageLoaded
+        , HE.onError \_ -> ImageNotFound
+        , HP.class_ $ wrap $ Array.intercalate " "
+            [ "absolute h-full w-full object-cover rounded transition-opacity"
+            , if state.status /= LoadedImage then "opacity-0" else "opacity-100"
+            ]
+        ]
+
     ]
 
 handleAction ::
