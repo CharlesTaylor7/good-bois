@@ -1,3 +1,6 @@
+-- | This component renders no html directly.
+-- | It performing api calls, and caching previous calls to the breeds or images api. 
+-- | It tracks the current page and delegates rendering to the relevant child component.
 module DogCeo.Component.App
   ( component
   ) where

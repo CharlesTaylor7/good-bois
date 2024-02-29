@@ -1,3 +1,4 @@
+--| Lists all dog breeds and sub breeds in alphabetical order.
 module DogCeo.Component.Breeds
   ( component
   , Output(..)

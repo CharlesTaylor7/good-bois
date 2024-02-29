@@ -1,3 +1,9 @@
+--| Image viewer for a particular breed of dogs
+--| handles paginating though images and displaying them.
+--| Some of the image urls returned by the dog.ceo API are dead links. 
+--| If a link is dead, the image is replaced with a custom error image.
+--| While an image is loading, a placeholder loading gif is shown in its place.
+--| Since images do not load instantly and can load out of order, this helps reduce jarring  "popping" and "sliding" of elements.
 module DogCeo.Component.Images
   ( component
   , Output(..)
