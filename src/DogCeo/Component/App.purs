@@ -15,7 +15,9 @@ import DogCeo.Component.Breeds as BreedsPage
 import DogCeo.Component.Images as ImagesPage
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (Breed, BreedGroup)
+import Effect.Aff (Milliseconds(..), delay)
 import Effect.Aff.Class (class MonadAff)
+import Halogen (liftAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.Router.Class (class MonadRouter)
@@ -124,6 +126,9 @@ handleAction = case _ of
   -- Navigate to the images page for this breed
   HandleImagesPage breed ImagesPage.FetchImages -> do
     images <- ImagesApi.fetch breed
+
+    -- liftAff $ delay $ Milliseconds 400_000.0
+
     H.modify_ \state -> state
       { imagesCache = state.imagesCache # Map.insert breed images
       }

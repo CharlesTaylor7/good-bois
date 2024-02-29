@@ -91,7 +91,7 @@ renderImages state =
         [ HP.class_ $ wrap "flex justify-center"
         ]
         [ HH.img
-            [ HP.src "/static/loading.gif"
+            [ HP.src "/good-bois/static/loading.gif"
             , HP.alt "Loading"
             ]
         ]
@@ -105,35 +105,32 @@ renderImages state =
         [ HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ]
             $ pageImages { page: state.page, images }
                 <#> \src ->
-                  HH.div []
+                  HH.div [ HP.class_ $ wrap "relative h-96 w-96" ]
                     [ HH.img
                         [ HP.src src
                         , HE.onLoad \_ -> ImageLoaded src
                         , HE.onError \_ -> ImageNotFound src
                         , HP.class_ $ wrap $ Array.intercalate " "
-                            [ "object-cover h-96 w-96 rounded"
-
-                            , if imgStatus src state /= LoadedImage then "hidden" else ""
+                            [ "absolute h-full w-full object-cover rounded transition-opacity"
+                            , if imgStatus src state /= LoadedImage then "opacity-0" else "opacity-100"
                             ]
                         ]
-
                     , HH.img
-                        [ HP.src "/static/loading.gif"
+                        [ HP.src "/good-bois/static/loading.gif"
                         , HP.alt "Loading"
                         , HP.class_ $ wrap $ Array.intercalate " "
-                            [ "object-cover h-96 w-96 rounded"
-                            , if imgStatus src state /= LoadingImage then "hidden" else ""
+                            [ "absolute h-full w-full object-cover rounded transition-opacity"
+                            , if imgStatus src state /= LoadingImage then "opacity-0" else "opacity-100"
                             ]
                         ]
                     , HH.div
                         [ HP.class_ $ wrap $ Array.intercalate " "
-                            [ "flex h-96 w-96 rounded items-center justify-center"
-
-                            , if imgStatus src state /= ErrorImage then "hidden" else ""
+                            [ "absolute h-full w-full flex rounded items-center justify-center transition-opacity"
+                            , if imgStatus src state /= ErrorImage then "opacity-0" else "opacity-100"
                             ]
                         ]
                         [ HH.img
-                            [ HP.src "/static/image-not-found.png"
+                            [ HP.src "/good-bois/static/image-not-found.png"
                             , HP.alt $ src <> " failed to load"
                             , HP.class_ $ wrap "h-32 w-32"
                             ]
