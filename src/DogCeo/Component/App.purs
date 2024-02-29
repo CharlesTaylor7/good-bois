@@ -6,7 +6,7 @@ import Prelude
 
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Debug (spy)
 import DogCeo.Api.Breeds as BreedsApi
 import DogCeo.Api.Images as ImagesApi
@@ -88,12 +88,15 @@ render state =
         ImagesPage.component
         { breed
         , page
-        , images:
-            state.imagesCache
-              # Map.lookup breed
-              # fromMaybe Api.Loading
+        , images: state # lookupImages breed
         }
         (HandleImagesPage breed)
+
+lookupImages :: Breed -> State -> Api.Result (Array String)
+lookupImages breed state =
+  state.imagesCache
+    # Map.lookup breed
+    # fromMaybe Api.Loading
 
 handleAction ::
   forall output monad.
@@ -117,8 +120,11 @@ handleAction = case _ of
     breeds <- BreedsApi.fetch
     H.modify_ \state -> state { breeds = breeds }
 
+  -- Fetches the images if we haven't selected this breed before
+  -- Navigate to the images page for this breed
   HandleImagesPage breed ImagesPage.FetchImages -> do
     images <- ImagesApi.fetch breed
     H.modify_ \state -> state
       { imagesCache = state.imagesCache # Map.insert breed images
       }
+
