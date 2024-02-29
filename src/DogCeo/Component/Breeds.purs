@@ -10,7 +10,6 @@ import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Debug (spy)
 import DogCeo.Api.Utils as Api
-import DogCeo.Api.Utils as Api
 import DogCeo.Routes (Route(..))
 import DogCeo.Types (Breed, BreedGroup)
 import Effect.Aff.Class (class MonadAff)

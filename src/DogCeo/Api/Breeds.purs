@@ -6,7 +6,6 @@ import Prelude
 
 import Data.Tuple.Nested ((/\))
 import DogCeo.Api.Utils as Api
-import DogCeo.Api.Utils as Api
 import DogCeo.Types (BreedGroup)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Fetch as Fetch

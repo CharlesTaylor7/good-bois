@@ -8,24 +8,16 @@ import Prelude
 
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.Newtype (wrap)
-import Data.Set (Set)
-import Data.Set as Set
 import Debug (spy)
 import DogCeo.Api.Utils as Api
 import DogCeo.Component.Images.Types (Action(..), ImageLoad(..), Input, State)
 import DogCeo.Component.Images.View as View
 import DogCeo.Routes (Route(..))
-import DogCeo.Types (Breed)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
-import Halogen as H
-import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.Router.Class (class MonadRouter)
 import Halogen.Router.Class as HR
-import Record as Record
 import Record as Record
 
 data Output = FetchImages
