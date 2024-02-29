@@ -8,6 +8,8 @@ on:
       - src/**
       - public/**
       - vite.config.ts
+      - package.json
+      - package-lock.json
 
 jobs:
   deploy:
