@@ -25,8 +25,7 @@ type State =
 data Action
   = Init
   | Receive Input
-  | ImageNotFound
-  | ImageLoaded
+  | SetStatus ImageLoad
 
 component ::
   forall query output monad.
@@ -88,8 +87,8 @@ render state =
 
     , HH.img
         [ HP.src state.current
-        , HE.onLoad \_ -> ImageLoaded
-        , HE.onError \_ -> ImageNotFound
+        , HE.onLoad \_ -> SetStatus LoadedImage
+        , HE.onError \_ -> SetStatus ErrorImage
         , HP.class_ $ wrap $ Array.intercalate " "
             [ "absolute h-full w-full object-cover rounded transition-opacity"
             , if state.status /= LoadedImage then "opacity-0" else "opacity-100"
@@ -106,10 +105,8 @@ handleAction = case _ of
   Init -> pure unit
   Receive { url } ->
     H.modify_ $ \state -> (state { current = url, previous = Just state.current, status = LoadingImage })
-  ImageNotFound ->
-    H.modify_ $ (_ { status = ErrorImage })
-  ImageLoaded ->
-    H.modify_ $ (_ { status = LoadedImage })
+  SetStatus status ->
+    H.modify_ $ (_ { status = status })
 
 data ImageLoad
   = LoadingImage
