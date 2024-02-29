@@ -1,4 +1,4 @@
 - [ ] Daisy UI
 - [ ] PWA
 - [ ] Client side routing
-- [ ] CSS transitions to help with image flicker
+- [ ] CSS transitions between dog images

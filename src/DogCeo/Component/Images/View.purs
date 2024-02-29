@@ -32,21 +32,12 @@ renderHeader state =
         ]
         [ HH.text "Back to Breeds" ]
 
-    , HH.div
-        [ HP.class_ $ wrap "flex flex-col items-center" ]
-        [ HH.h2
-            [ HP.class_ $ wrap "text-xl font-semibold capitalize" ]
-            [ HH.text $
-                case state.breed.subBreed of
-                  Just subBreed -> subBreed <> " " <> state.breed.name
-                  Nothing -> state.breed.name
-            ]
-        , HH.text $
-            case state.images of
-              Api.Loading -> ""
-              Api.Error _ -> ""
-              Api.Success images ->
-                show (Array.length images) <> " images"
+    , HH.h2
+        [ HP.class_ $ wrap "text-xl font-semibold capitalize" ]
+        [ HH.text $
+            case state.breed.subBreed of
+              Just subBreed -> subBreed <> " " <> state.breed.name
+              Nothing -> state.breed.name
         ]
 
     , HH.div [ HP.class_ $ wrap "text-center" ] $
