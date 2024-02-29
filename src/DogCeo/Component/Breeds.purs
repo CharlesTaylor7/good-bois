@@ -58,7 +58,7 @@ render :: forall monad. State -> H.ComponentHTML Action () monad
 render state =
   HH.div
     []
-    [ HH.h2 [ HP.class_ $ wrap "m-3 text-center text-2xl font-semibold" ] [ HH.text "Dog Breeds" ]
+    [ HH.h2 [ HP.class_ $ wrap "m-3 text-center text-xl font-semibold" ] [ HH.text "Dog Breeds" ]
     , case state.breeds of
         Api.Loading ->
           HH.div
