@@ -5,17 +5,18 @@ module DogCeo.Component.Images.View
 import Prelude
 
 import Data.Array as Array
-import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import DogCeo.Api.Utils as Api
-import DogCeo.Component.Images.Types (Action(..), ImageLoad(..), State)
+import DogCeo.Component.Image as Image
+import DogCeo.Component.Images.Types (Action(..), Slots, State)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Type.Proxy (Proxy(..))
 
-render :: forall monad. State -> H.ComponentHTML Action () monad
+render :: forall monad. State -> H.ComponentHTML Action Slots monad
 render state =
   HH.div
     []
@@ -23,7 +24,7 @@ render state =
     , renderImages state
     ]
 
-renderHeader :: forall monad. State -> H.ComponentHTML Action () monad
+renderHeader :: forall monad slots. State -> H.ComponentHTML Action slots monad
 renderHeader state =
   HH.div [ HP.class_ $ wrap "m-6 flex flex-row flex-wrap items-center justify-evenly" ]
     [ HH.a
@@ -74,7 +75,7 @@ renderHeader state =
   where
   buttonStyle = HP.class_ $ wrap "border rounded-lg py-2 px-4 bg-sky-300 disabled:bg-slate-200"
 
-renderImages :: forall monad. State -> H.ComponentHTML Action () monad
+renderImages :: forall monad. State -> H.ComponentHTML Action Slots monad
 renderImages state =
   case state.images of
     Api.Loading ->
@@ -95,50 +96,19 @@ renderImages state =
       HH.div [] $
         [ HH.div [ HP.class_ $ wrap "flex flex-row flex-wrap items-center justify-center gap-4" ]
             $ pageImages { page: state.page, images }
-                <#> \src ->
-                  HH.div [ HP.class_ $ wrap "relative h-96 w-96" ]
-                    [ HH.img
-                        [ HP.src src
-                        , HE.onLoad \_ -> ImageLoaded src
-                        , HE.onError \_ -> ImageNotFound src
-                        , HP.class_ $ wrap $ Array.intercalate " "
-                            [ "absolute h-full w-full object-cover rounded transition-opacity"
-                            , if imgStatus src state /= LoadedImage then "opacity-0" else "opacity-100"
-                            ]
-                        ]
-                    , HH.img
-                        [ HP.src "/good-bois/static/loading.gif"
-                        , HP.alt "Loading"
-                        , HP.class_ $ wrap $ Array.intercalate " "
-                            [ "absolute h-full w-full object-cover rounded transition-opacity"
-                            , if imgStatus src state /= LoadingImage then "opacity-0" else "opacity-100"
-                            ]
-                        ]
-                    , HH.div
-                        [ HP.class_ $ wrap $ Array.intercalate " "
-                            [ "absolute h-full w-full flex rounded items-center justify-center transition-opacity"
-                            , if imgStatus src state /= ErrorImage then "opacity-0" else "opacity-100"
-                            ]
-                        ]
-                        [ HH.img
-                            [ HP.src "/good-bois/static/image-not-found.png"
-                            , HP.alt $ src <> " failed to load"
-                            , HP.class_ $ wrap "h-32 w-32"
-                            ]
-                        ]
+                # Array.mapWithIndex \index src ->
+                    HH.slot
+                      (Proxy :: _ "image")
+                      index
+                      Image.component
+                      { url: src }
+                      absurd
 
-                    ]
         ]
 
 {-
   Pagination utilities
 -}
-
-imgStatus :: String -> State -> ImageLoad
-imgStatus src state =
-  state.imageStatus
-    # Map.lookup src
-    # fromMaybe LoadingImage
 
 minPage :: Int
 minPage = 1

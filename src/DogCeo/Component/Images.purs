@@ -12,10 +12,9 @@ module DogCeo.Component.Images
 
 import Prelude
 
-import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import DogCeo.Api.Utils as Api
-import DogCeo.Component.Images.Types (Action(..), ImageLoad(..), Input, State)
+import DogCeo.Component.Images.Types (Action(..), Input, Slots, State)
 import DogCeo.Component.Images.View as View
 import DogCeo.Routes (Route(..))
 import Effect.Aff.Class (class MonadAff)
@@ -44,17 +43,14 @@ component =
     }
 
 initialState :: Input -> State
-initialState = Record.merge
-  { page: 1
-  , imageStatus: Map.empty
-  }
+initialState input = input
 
 handleAction ::
   forall monad.
   MonadRouter Route monad =>
   MonadAff monad =>
   Action ->
-  H.HalogenM State Action () Output monad Unit
+  H.HalogenM State Action Slots Output monad Unit
 handleAction =
   case _ of
     Init -> do
@@ -79,14 +75,3 @@ handleAction =
     NavToNextPage -> do
       { breed, page } <- H.get
       HR.navigate $ ImagesRoute { breed, page: page + 1 }
-
-    ImageNotFound src -> do
-      H.modify_ \state -> state
-        { imageStatus = state.imageStatus
-            # Map.insert src ErrorImage
-        }
-    ImageLoaded src -> do
-      H.modify_ \state -> state
-        { imageStatus = state.imageStatus
-            # Map.insert src LoadedImage
-        }
