@@ -12,7 +12,7 @@
     "bundle": "npm run build && vite build public --outDir=../dist && cp -r public/static dist/"
   },
   "devDependencies": {
-    "purescript": "0.15.10",
+    "purescript": "0.15.13",
     "spago": "0.93.25",
     "tailwindcss": "^3.4.0",
     "vite": "^5.0.10"
