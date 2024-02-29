@@ -1,5 +1,5 @@
 {
-  "name": "panoramic-interview-part-2",
+  "name": "good-bois",
   "author": "Charles Taylor <charlestaylor95@gmail.com>",
   "version": "0.0.0",
   "license": "MIT",
@@ -8,12 +8,12 @@
     "postinstall": "spago install",
     "watch:js": "vite --port=3000 public",
     "watch:purs": "watchexec -e purs,yaml,js -- npm run build",
-    "build": "spago build -p dog-breed-ui",
+    "build": "spago build",
     "bundle": "npm run build && vite build public --outDir=../dist && cp -r public/static dist/"
   },
   "devDependencies": {
-    "purescript": "0.15.10",
-    "spago": "0.93.23",
+    "purescript": "0.15.13",
+    "spago": "0.93.25",
     "tailwindcss": "^3.4.0",
     "vite": "^5.0.10"
   }
