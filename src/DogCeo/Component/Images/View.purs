@@ -128,17 +128,6 @@ renderImages state =
                         ]
 
                     ]
-        --| Prefetches the next page of images
-        --| Halogen's dom maniupulation keeps the same dom elements around and just swaps out the img src attributes. 
-        --| This means after clicking 'Next', you can see stale images from the previous page while the new image is loading.
-        --| Prefetching images allows images to swap out seemlessly after clicking the Next button.
-        , HH.div []
-            $ pageImages { page: state.page + 1, images }
-                <#> \src ->
-                  HH.link
-                    [ HP.rel "prefetch"
-                    , HP.href src
-                    ]
         ]
 
 {-
