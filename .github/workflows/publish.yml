@@ -1,0 +1,34 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/**
+      - src/**
+      - public/**
+
+jobs:
+  deploy:
+    name: Deploy to Github Pages
+    permissions:
+      pages: write
+    runs-on: ubuntu-latest
+    env:
+      OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Build
+        run: |
+          npm install
+          npm run bundle
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: dist
