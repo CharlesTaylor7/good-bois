@@ -63,14 +63,14 @@ handleAction =
     Receive input ->
       H.modify_ $ Record.merge input
 
-    NavBackToBreeds ->
+    NavToBreeds ->
       HR.navigate BreedsRoute
 
-    GotoPreviousPage -> do
+    NavToPreviousPage -> do
       { breed, page } <- H.get
       HR.navigate $ ImagesRoute { breed, page: page - 1 }
 
-    GotoNextPage -> do
+    NavToNextPage -> do
       { breed, page } <- H.get
       HR.navigate $ ImagesRoute { breed, page: page + 1 }
 

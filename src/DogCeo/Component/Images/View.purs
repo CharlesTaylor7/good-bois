@@ -28,7 +28,7 @@ renderHeader state =
   HH.div [ HP.class_ $ wrap "m-6 flex flex-row flex-wrap items-center justify-evenly " ]
     [ HH.a
         [ HP.class_ $ wrap "flex items-center p-2 cursor-pointer underline decoration-blue-400 text-sky-500"
-        , HE.onClick \_ -> NavBackToBreeds
+        , HE.onClick \_ -> NavToBreeds
         ]
         [ HH.text "Back to Breeds" ]
 
@@ -46,14 +46,14 @@ renderHeader state =
             [ HH.button
                 [ buttonStyle
                 , HP.disabled $ state.page <= minPage
-                , HE.onClick \_ -> GotoPreviousPage
+                , HE.onClick \_ -> NavToPreviousPage
                 ]
                 [ HH.text "Previous" ]
 
             , HH.button
                 [ buttonStyle
                 , HP.disabled $ state.page >= maxPage state
-                , HE.onClick \_ -> GotoNextPage
+                , HE.onClick \_ -> NavToNextPage
                 ]
                 [ HH.text "Next" ]
 

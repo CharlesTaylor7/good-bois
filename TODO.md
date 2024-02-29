@@ -1,4 +1,3 @@
 - [ ] Daisy UI
 - [ ] PWA
-- [ ] Client side routing
 - [ ] CSS transitions between dog images

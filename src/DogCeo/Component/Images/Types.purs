@@ -22,10 +22,10 @@ type State =
 
 data Action
   = Init
-  | NavBackToBreeds
   | Receive Input
-  | GotoPreviousPage
-  | GotoNextPage
+  | NavToBreeds
+  | NavToPreviousPage
+  | NavToNextPage
   | ImageLoaded String
   | ImageNotFound String
 
