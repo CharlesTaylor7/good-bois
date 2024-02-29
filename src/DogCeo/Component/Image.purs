@@ -6,7 +6,7 @@ module DogCeo.Component.Image
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Halogen as H
 import Halogen.HTML as HH
@@ -17,15 +17,12 @@ type Slot id = forall query. H.Slot query Void id
 type Input = { url :: String }
 
 type State =
-  { previous :: Maybe String
-  , current :: String
-  , status :: ImageLoad
+  { img_a :: String
+  , img_b :: String
+  , toggle :: Boolean
   }
 
-data Action
-  = Init
-  | Receive Input
-  | SetStatus ImageLoad
+data Action = Receive Input
 
 component ::
   forall query output monad.
@@ -36,16 +33,15 @@ component =
     , render
     , eval: H.mkEval $ H.defaultEval
         { handleAction = handleAction
-        , initialize = Just Init
         , receive = Just <<< Receive
         }
     }
 
 initialState :: Input -> State
 initialState { url } =
-  { previous: Nothing
-  , current: url
-  , status: LoadingImage
+  { img_a: ""
+  , img_b: url
+  , toggle: false
   }
 
 render ::
@@ -55,46 +51,25 @@ render ::
 render state =
   HH.div
     [ HP.class_ $ wrap "relative h-96 w-96" ]
-    [ HH.img
-        [ HP.src "/good-bois/static/loading.gif"
-        , HP.alt "Loading"
-        , HP.class_ $ wrap $ Array.intercalate " "
-            [ "absolute h-full w-full object-cover rounded transition-opacity"
-            , if state.status /= LoadingImage then "opacity-0" else "opacity-100"
-            ]
-        ]
+    [ renderImage (if state.toggle then "opacity-100" else "opacity-0") state.img_a
+    , renderImage (if state.toggle then "opacity-0" else "opacity-100") state.img_b
+    ]
 
-    , HH.div
-        [ HP.class_ $ wrap $ Array.intercalate " "
-            [ "absolute h-full w-full flex rounded items-center justify-center transition-opacity"
-            , if state.status /= ErrorImage then "opacity-0" else "opacity-100"
-            ]
+renderImage ::
+  forall slots monad.
+  String ->
+  String ->
+  H.ComponentHTML
+    Action
+    slots
+    monad
+renderImage className url =
+  HH.img
+    [ HP.src url
+    , HP.class_ $ wrap $ Array.intercalate " "
+        [ "absolute h-full w-full object-cover rounded transition-opacity"
+        , className
         ]
-        [ HH.img
-            [ HP.src "/good-bois/static/image-not-found.png"
-            , HP.alt $ state.current <> " failed to load"
-            , HP.class_ $ wrap "h-32 w-32"
-            ]
-        ]
-
-    , HH.img
-        [ HP.src $ fromMaybe "" state.previous
-        , HP.class_ $ wrap $ Array.intercalate " "
-            [ "absolute h-full w-full object-cover rounded transition-opacity"
-            , if state.status /= LoadedImage then "opacity-0" else "opacity-100"
-            ]
-        ]
-
-    , HH.img
-        [ HP.src state.current
-        , HE.onLoad \_ -> SetStatus LoadedImage
-        , HE.onError \_ -> SetStatus ErrorImage
-        , HP.class_ $ wrap $ Array.intercalate " "
-            [ "absolute h-full w-full object-cover rounded transition-opacity"
-            , if state.status /= LoadedImage then "opacity-0" else "opacity-100"
-            ]
-        ]
-
     ]
 
 handleAction ::
@@ -102,15 +77,7 @@ handleAction ::
   Action ->
   H.HalogenM State Action slots output monad Unit
 handleAction = case _ of
-  Init -> pure unit
   Receive { url } ->
-    H.modify_ $ \state -> (state { current = url, previous = Just state.current, status = LoadingImage })
-  SetStatus status ->
-    H.modify_ $ (_ { status = status })
-
-data ImageLoad
-  = LoadingImage
-  | LoadedImage
-  | ErrorImage
-
-derive instance Eq ImageLoad
+    H.modify_ $ \state ->
+      if state.toggle then state { img_b = url, toggle = false }
+      else state { img_a = url, toggle = true }

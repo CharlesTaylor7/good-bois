@@ -4,6 +4,6 @@
 
 @layer utilities {
   .transition-opacity {
-    transition: opacity 400ms;
+    transition: opacity 0.5s;
   }
 }
