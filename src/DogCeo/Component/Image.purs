@@ -26,7 +26,7 @@ type State =
 
 data Action
   = Receive Input
-  | Load Option
+  | Load { option :: Option, src :: String }
 
 type Image = { loading :: Boolean, src :: String }
 data Option = A | B
@@ -49,7 +49,7 @@ component =
 initialState :: Input -> State
 initialState { url } =
   { img_a: { loading: true, src: url }
-  , img_b: { loading: false, src: "" }
+  , img_b: { loading: true, src: "" }
   , active: A
   }
 
@@ -78,7 +78,7 @@ renderImage ::
 renderImage { option, state } =
   [ HH.img
       [ HP.src img.src
-      , HE.onLoad \_ -> Load option
+      , HE.onLoad \_ -> Load { option, src: img.src }
       , HP.class_ $ wrap $ Array.intercalate " "
           [ "absolute h-full w-full object-cover rounded transition-opacity"
           , if option == state.active && not img.loading then "opacity-100" else "opacity-0"
@@ -97,47 +97,27 @@ renderImage { option, state } =
     A -> state.img_a
     B -> state.img_b
 
-{-
-renderImage ::
-  forall slots monad.
-  { option :: Option, state :: State } ->
-  H.ComponentHTML
-    Action
-    slots
-    monad
-renderImage { option, state } =
-  HH.img
-    [ HP.src img.src
-    , HP.class_ $ wrap $ Array.intercalate " "
-        [ "absolute h-full w-full object-cover rounded transition-opacity"
-        , className
-        ]
-    ]
-  where
-  className = if state.active == option then "opacity-100" else "opacity-0"
-  -}
-
 handleAction ::
   forall output monad slots.
   Action ->
   H.HalogenM State Action slots output monad Unit
 handleAction = case _ of
-  Load option ->
+  Load { option, src } ->
     H.modify_ \state ->
       case option of
-        A -> state { img_a { loading = false } }
-        B -> state { img_b { loading = false } }
+        A -> if state.img_a.src == src then state { img_a { loading = false } } else state
+        B -> if state.img_b.src == src then state { img_b { loading = false } } else state
 
   Receive { url } ->
     H.modify_ \state ->
       case state.active of
         A ->
           state
-            { img_b = { loading: true, src: url }
+            { img_b = { loading: state.img_b.src /= url, src: url }
             , active = B
             }
         B ->
           state
-            { img_a = { loading: true, src: url }
+            { img_a = { loading: state.img_a.src /= url, src: url }
             , active = A
             }

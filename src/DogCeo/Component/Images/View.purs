@@ -128,7 +128,7 @@ maxPage { images } =
         q + if r > 0 then 1 else 0
 
 imagesPerPage :: Int
-imagesPerPage = 20
+imagesPerPage = 8
 
 pageImages ::
   { page :: Int
