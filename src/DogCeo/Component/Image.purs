@@ -1,3 +1,5 @@
+--| Renders a particular image in the image viewer grid.
+--| Responsible for cross fading with the previous image or loading state.
 module DogCeo.Component.Image
   ( component
   , Slot
@@ -17,12 +19,19 @@ type Slot id = forall query. H.Slot query Void id
 type Input = { url :: String }
 
 type State =
-  { img_a :: String
-  , img_b :: String
-  , toggle :: Boolean
+  { img_a :: Image
+  , img_b :: Image
+  , active :: Option
   }
 
-data Action = Receive Input
+data Action
+  = Receive Input
+  | Load Option
+
+type Image = { loading :: Boolean, src :: String }
+data Option = A | B
+
+derive instance Eq Option
 
 component ::
   forall query output monad.
@@ -39,9 +48,9 @@ component =
 
 initialState :: Input -> State
 initialState { url } =
-  { img_a: ""
-  , img_b: url
-  , toggle: false
+  { img_a: { loading: true, src: url }
+  , img_b: { loading: false, src: "" }
+  , active: A
   }
 
 render ::
@@ -51,33 +60,84 @@ render ::
 render state =
   HH.div
     [ HP.class_ $ wrap "relative h-96 w-96" ]
-    [ renderImage (if state.toggle then "opacity-100" else "opacity-0") state.img_a
-    , renderImage (if state.toggle then "opacity-0" else "opacity-100") state.img_b
-    ]
+    $
+      join
+        [ renderImage { option: A, state }
+        , renderImage { option: B, state }
+        ]
 
 renderImage ::
   forall slots monad.
-  String ->
-  String ->
+  { option :: Option, state :: State } ->
+  Array
+    ( H.ComponentHTML
+        Action
+        slots
+        monad
+    )
+renderImage { option, state } =
+  [ HH.img
+      [ HP.src img.src
+      , HE.onLoad \_ -> Load option
+      , HP.class_ $ wrap $ Array.intercalate " "
+          [ "absolute h-full w-full object-cover rounded transition-opacity"
+          , if option == state.active && not img.loading then "opacity-100" else "opacity-0"
+          ]
+      ]
+  , HH.img
+      [ HP.src "/good-bois/static/loading.gif"
+      , HP.class_ $ wrap $ Array.intercalate " "
+          [ "absolute h-full w-full object-cover rounded transition-opacity"
+          , if option == state.active && img.loading then "opacity-100" else "opacity-0"
+          ]
+      ]
+  ]
+  where
+  img = case option of
+    A -> state.img_a
+    B -> state.img_b
+
+{-
+renderImage ::
+  forall slots monad.
+  { option :: Option, state :: State } ->
   H.ComponentHTML
     Action
     slots
     monad
-renderImage className url =
+renderImage { option, state } =
   HH.img
-    [ HP.src url
+    [ HP.src img.src
     , HP.class_ $ wrap $ Array.intercalate " "
         [ "absolute h-full w-full object-cover rounded transition-opacity"
         , className
         ]
     ]
+  where
+  className = if state.active == option then "opacity-100" else "opacity-0"
+  -}
 
 handleAction ::
   forall output monad slots.
   Action ->
   H.HalogenM State Action slots output monad Unit
 handleAction = case _ of
+  Load option ->
+    H.modify_ \state ->
+      case option of
+        A -> state { img_a { loading = false } }
+        B -> state { img_b { loading = false } }
+
   Receive { url } ->
-    H.modify_ $ \state ->
-      if state.toggle then state { img_b = url, toggle = false }
-      else state { img_a = url, toggle = true }
+    H.modify_ \state ->
+      case state.active of
+        A ->
+          state
+            { img_b = { loading: true, src: url }
+            , active = B
+            }
+        B ->
+          state
+            { img_a = { loading: true, src: url }
+            , active = A
+            }
